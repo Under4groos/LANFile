@@ -14,7 +14,7 @@ public partial class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         ObservableCollection<DeviceModel> devices = [];
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 15; i++)
         {
             devices.Add(new DeviceModel()
             {
