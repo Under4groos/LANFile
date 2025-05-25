@@ -5,6 +5,10 @@
             <!-- Add Controls for Previewer Here -->
         </Border>
     </Design.PreviewWith>
-
+    <Style Selector="TextBlock.F14L">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
     <!-- Add Styles Here -->
 </Styles>

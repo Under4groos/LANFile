@@ -11,28 +11,28 @@
     <Design.DataContext>
         <vm:MainViewModel />
     </Design.DataContext>
-    <Grid ColumnDefinitions="50,*">
-        <Border Grid.Column="0" Margin="5,0,0,0">
+    <Grid ColumnDefinitions="Auto,*">
+        <Border Grid.Column="0">
             <Grid>
                 <Border Classes="VerticalM1 BorderM1">
                     <Grid>
                         <ScrollViewer>
                             <StackPanel>
                                 <Button
-                                    Classes="SegoeFluent"
+                                    Classes="SegoeFluent Min40"
                                     Content="&#xe700;" />
                                 <Button
-                                    Classes="SegoeFluent"
+                                    Classes="SegoeFluent Min40"
                                     Content="&#xe701;" />
                                 <Button
-                                    Classes="SegoeFluent"
+                                    Classes="SegoeFluent Min40"
                                     Content="&#xe705;" />
                             </StackPanel>
                         </ScrollViewer>
                         <ScrollViewer VerticalAlignment="Bottom">
                             <StackPanel>
                                 <Button
-                                    Classes="SegoeFluent"
+                                    Classes="SegoeFluent Min40"
                                     Content="&#xe713;" />
 
                             </StackPanel>
@@ -41,11 +41,81 @@
                 </Border>
             </Grid>
         </Border>
-        <Border Margin="5" Grid.Column="1" Classes="BorderM1">
-            <Grid Margin="10">
-                <TextBlock>Test1</TextBlock>
+        <Grid Grid.Column="1" Margin="0,5,5,5">
+            <Grid RowDefinitions="*,Auto">
+                <Border Grid.Row="0" Classes="BorderM1" Margin="0,0,0,4">
+                    <Grid>
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding  Devices}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel>
+                                            <VirtualizingStackPanel HorizontalAlignment="Stretch"
+                                                                    Orientation="Vertical" />
+                                        </StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Classes="Base BorderM1" MinHeight="30" Margin="4,0,0,4">
+                                            <Grid ColumnDefinitions="50,*">
+                                                <Grid Grid.Column="0">
+                                                    <Svg Margin="10" Path="{Binding Os , StringFormat='/Assets/Svg/{0}.svg'}"></Svg>
+                                                </Grid>
+                                                
+                                                <StackPanel Grid.Column="1">
+                                                    <WrapPanel Margin="5" HorizontalAlignment="Stretch" Orientation="Vertical">
+                                                        <TextBlock Classes="F14L" Text="{Binding  Name, StringFormat='User: {0}'}"></TextBlock>
+                                                        <TextBlock Classes="F14L" Text="{Binding  Host, StringFormat='Host: {0}'}"></TextBlock>
+                                                        <TextBlock Classes="F14L" Text="{Binding  Ping, StringFormat='Ping: {0}'}"></TextBlock>
+                                                        <TextBlock Classes="F14L" Text="{Binding Os , StringFormat='/Assets/Svg/{0}.svg'}"></TextBlock>
+                                                    </WrapPanel>
+                                                    <WrapPanel HorizontalAlignment="Right" Margin="0,10,0,0">
+                                                     
+                                                        <Button
+                                                            Classes="Base"
+                                                            Content="Send file" />
+                                                        <Button
+                                                            Classes="Base"
+                                                            Content="Get files" />
+                                                        <Button
+                                                            Classes="Base"
+                                                            Content="Refresh" />
+
+                                                    </WrapPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Border>
+                <Border Grid.Row="1" VerticalAlignment="Bottom" Classes="BorderM1">
+                    <Grid>
+                        <WrapPanel VerticalAlignment="Top">
+                            <Button
+                                MinHeight="30" MinWidth="30"
+                                Classes="SegoeFluent"
+                                Content="&#xe72c;" />
+                            <Button
+                                Classes="Base"
+                                Content="Connect" />
+                            <Button
+                                Classes="Base"
+                                Content="Close connect" />
+                            <Button
+                                Classes="Base"
+                                Content="Send string" />
+
+                        </WrapPanel>
+                    </Grid>
+                </Border>
             </Grid>
-        </Border>
+        </Grid>
+
     </Grid>
 
 </UserControl>

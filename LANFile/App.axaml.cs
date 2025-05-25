@@ -11,6 +11,8 @@ namespace LANFile;
 
 public class App : Application
 {
+    public static Random R = new Random();
+    
     public static string TitleApplication { get; set; } =
         $"{(OperatingSystem.IsAndroid() ? "Android" : "Windows")}-LANFile";
 

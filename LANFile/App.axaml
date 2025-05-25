@@ -23,6 +23,7 @@
     <Application.Styles>
         <FluentTheme DensityStyle="Compact" />
         <StyleInclude Source="/Resource/Style/Border.axaml" />
+        <StyleInclude Source="/Resource/Style/TextBlock.axaml" />
         <StyleInclude Source="Resource/Style/Button.axaml" />
     </Application.Styles>
 </Application>
