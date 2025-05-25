@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:LANFile.ViewModels"
+             xmlns:controls="clr-namespace:LANFile.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LANFile.Views.MainView"
+             Background="#1e1e1e"
+             x:DataType="vm:MainViewModel">
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+    <Grid ColumnDefinitions="50,*">
+        <Border Grid.Column="0" Margin="5,0,0,0">
+            <Grid>
+                <Border Classes="VerticalM1 BorderM1">
+                    <Grid>
+                        <ScrollViewer>
+                            <StackPanel>
+                                <Button
+                                    Classes="SegoeFluent"
+                                    Content="&#xe700;" />
+                                <Button
+                                    Classes="SegoeFluent"
+                                    Content="&#xe701;" />
+                                <Button
+                                    Classes="SegoeFluent"
+                                    Content="&#xe705;" />
+                            </StackPanel>
+                        </ScrollViewer>
+                        <ScrollViewer VerticalAlignment="Bottom">
+                            <StackPanel>
+                                <Button
+                                    Classes="SegoeFluent"
+                                    Content="&#xe713;" />
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+        <Border Margin="5" Grid.Column="1" Classes="BorderM1">
+            <Grid Margin="10">
+                <TextBlock>Test1</TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+
+</UserControl>

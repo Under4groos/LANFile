@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="Button.Base" Color="#2f2f2f" />
+    <SolidColorBrush x:Key="Button.Hover" Color="#3f3f3f" />
+    
+    
+    <SolidColorBrush x:Key="Border.DarkBase" Color="#202020"/>
+    <SolidColorBrush x:Key="Border.DarkBaseBorderBrush" Color="White" Opacity="0.05"/>
+</ResourceDictionary>

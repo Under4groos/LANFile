@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:LANFile.Views.Controls">
+    <ControlTheme x:Key="Button" TargetType="controls:SvgButton">
+        <Setter Property="Background" Value="{StaticResource Button.Base}" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch">
+
+
+                    <StackPanel Margin="4,4,4,4" Orientation="Horizontal">
+                        <Panel>
+                            <Svg x:Name="_svg"
+                                 HorizontalAlignment="Center"
+                                 Height="{TemplateBinding MinHeight}"
+                                 Path="{TemplateBinding Source}"
+                                 IsVisible="{TemplateBinding IconVisible}" />
+                        </Panel>
+
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Content="{TemplateBinding Content}"
+                                          VerticalContentAlignment="Center" VerticalAlignment="Stretch"
+                                          Margin="{TemplateBinding Padding}" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{StaticResource Button.Hover}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="^:pressed">
+            <Setter Property="Background" Value="Orange" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ControlTheme x:Key="ScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="Background" Value="{StaticResource Button.Base}" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel>
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      VerticalContentAlignment="Center" VerticalAlignment="Stretch"
+                                      Margin="{TemplateBinding Padding}" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>
