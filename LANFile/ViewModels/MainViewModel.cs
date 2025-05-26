@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LANFile.Models;
 
@@ -13,23 +14,23 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        Refresh();
+        
     }
+
     public void Refresh()
     {
         ObservableCollection<DeviceModel> devices = [];
-        for (int i = 0; i < 15; i++)
+        for (var i = 0; i < 15; i++)
         {
             devices.Add(new DeviceModel()
             {
-                Host = $"{App.R.Next(0,255)}.{App.R.Next(0,255)}.{App.R.Next(0,255)}.{App.R.Next(0,255)}",
+                Host = $"{App.R.Next(0, 255)}.{App.R.Next(0, 255)}.{App.R.Next(0, 255)}.{App.R.Next(0, 255)}",
                 Name = $"{Guid.NewGuid()}".Substring(10),
-                Os = $"{(  i/2 == 1  ? "android" : "windows")}",
-                Port = $"{App.R.Next(0,255)}{App.R.Next(0,255)}{App.R.Next(0,255)}{App.R.Next(0,255)}",
-                Ping = App.R.Next(10,1000)
+                Os = $"{(i / 2 == 1 ? "android" : "windows")}",
+                Port = $"{App.R.Next(0, 255)}{App.R.Next(0, 255)}{App.R.Next(0, 255)}{App.R.Next(0, 255)}",
+                Ping = App.R.Next(10, 1000)
             });
         }
         this.Devices = devices;
     }
-    
 }

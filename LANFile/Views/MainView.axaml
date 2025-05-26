@@ -78,20 +78,22 @@
                     <Grid>
                         <WrapPanel VerticalAlignment="Top">
                             <Button
+                                Click="ButtonClickRefresh"
                                 MinHeight="30" MinWidth="30"
                                 Classes="SegoeFluent"
                                 Content="&#xe72c;" />
                             <Button
-                                Click="Button_OnClick"
+                                Click="ButtonClickDispose"
                                 Classes="Base"
-                                Content="Connect" />
+                                Content="DisposeAll" />
                             <Button
+                                Click="ButtonClickBeacon"
                                 Classes="Base"
-                                Content="Close connect" />
+                                Content="Start Beacon" />
                             <Button
+                                Click="ButtonClickFindDevice"
                                 Classes="Base"
-                                Content="Send string" />
-
+                                Content="Find device" />
                         </WrapPanel>
                     </Grid>
                 </Border>

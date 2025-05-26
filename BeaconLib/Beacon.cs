@@ -86,7 +86,12 @@ public class Beacon : IDisposable
             udp.Send(responseData, responseData.Length, remote);
         }
 
-        if (!Stopped) udp.BeginReceive(ProbeReceived, null);
+        if (!Stopped) BeginReceived();
+    }
+
+    public void BeginReceived()
+    {
+        udp.BeginReceive(ProbeReceived, null);
     }
 
     internal static bool HasPrefix<T>(IEnumerable<T> haystack, IEnumerable<T> prefix)

@@ -1,23 +1,43 @@
 using System;
 using System.Linq;
+using Android.App;
+using Android.OS;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using LANFile.ViewModels;
 using LANFile.Views;
+using Application = Avalonia.Application;
 
 namespace LANFile;
 
 public class App : Application
 {
     public static Random R = new Random();
-    
-    public static string TitleApplication { get; set; } =
-        $"{(OperatingSystem.IsAndroid() ? "Android" : "Windows")}-LANFile";
 
+    public static string NameApplication { get; set; }
+        
+
+    
+    public static string Platform { get; set; } =
+        $"{(OperatingSystem.IsAndroid() ? "Android" : "Windows")}";
+    
+    
     public override void Initialize()
     {
+        if (OperatingSystem.IsAndroid())
+        {
+            NameApplication = $"{Build.Model ?? "Error"}";
+        }
+        else
+        {
+            NameApplication = $"{System.Security.Principal.WindowsIdentity.GetCurrent().Name}";
+        }
+
+        NameApplication += $"_{Guid.NewGuid().ToString().Substring(5)}";
+        
+        
         AvaloniaXamlLoader.Load(this);
     }
 

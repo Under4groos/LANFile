@@ -26,4 +26,10 @@
     <ItemGroup>
         <ProjectReference Include="..\BeaconLib\BeaconLib.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Mono.Android">
+        <HintPath>..\..\..\..\..\Program Files\dotnet\packs\Microsoft.Android.Ref.35\35.0.61\ref\net9.0\Mono.Android.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 </Project>

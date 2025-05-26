@@ -96,9 +96,12 @@ public class Probe : IDisposable
                 Debug.WriteLine(ex);
             }
 
+        // BeginReceived();
+    }
+    public void BeginReceived()
+    {
         udp.BeginReceive(ResponseReceived, null);
     }
-
     private void BackgroundLoop()
     {
         while (running)
