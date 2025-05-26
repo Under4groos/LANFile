@@ -16,7 +16,7 @@ public partial class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         this.Title = "LANFile-Debug";
-        Random();
+        
     }
     public void Random()
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using LANFile.Enums;
+using LANFile.Events;
 using LANFile.Extentions;
 
 namespace LANFile.Server
@@ -16,13 +17,14 @@ namespace LANFile.Server
         {
             get; private set;
         }
-
+        public HttpEvents.EventHttpListenerResponse? OnHttpListenerResponse;
       
 
-        public void Start(string host = "http://localhost:5197/")
+        public void Start(string host = "http://localhost:8080/")
         {
             Host = host;
             listener = new HttpListener();
+            
             listener.Prefixes.Add(Host);
             listener.Start();
             Console.WriteLine("Listening for connections on {0}", Host);
@@ -53,8 +55,9 @@ namespace LANFile.Server
                     Dictionary<string, string> Query = req.QueryString.ToDictionary();
                     string method = req.HttpMethod;
 
+                     
                     Console.WriteLine($"{req.Url.AbsolutePath}");
-                   
+                    OnHttpListenerResponse?.Invoke(req, resp, Query, method, req.Url);
                 }
                 catch (Exception e)
                 {

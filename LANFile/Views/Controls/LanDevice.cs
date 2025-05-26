@@ -63,9 +63,19 @@ public class LanDevice : ContentControl
         set => SetValue(PingProperty, value);
     }
 
+    public static readonly StyledProperty<string> HttpResultProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(HttpResult), "<null>");
+
+    public string HttpResult
+    {
+        get => GetValue(HttpResultProperty);
+        set => SetValue(HttpResultProperty, value);
+    }
+
 
     private WrapPanel? _wrapPanel;
     private Thread? _thread;
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -94,11 +104,13 @@ public class LanDevice : ContentControl
             case "ping":
                 this.Ping = "...";
                 var host = Host;
-                
+
                 button.IsEnabled = false;
-                
-                _thread = new Thread(() =>
+
+                _thread = new Thread(async () =>
                 {
+                    
+
                     try
                     {
                         Ping p1 = new Ping();
@@ -123,10 +135,9 @@ public class LanDevice : ContentControl
                     catch (Exception exception)
                     {
                         Console.WriteLine(exception);
-                       
                     }
                 });
-                
+
                 _thread.Start();
                 break;
         }

@@ -39,8 +39,12 @@
                                     Classes="Base"
                                     Content="Ping" />
                                 <Label Classes="F14L" VerticalContentAlignment="Center"
-                                       Content="{TemplateBinding Ping}">
-                                </Label>
+                                       Content="{TemplateBinding Ping}"/>
+                                
+                                <Label Classes="F14L" VerticalContentAlignment="Center"
+                                       Content="{TemplateBinding HttpResult}"/>
+                                    
+                               
                             </WrapPanel>
                         </StackPanel>
                     </Grid>

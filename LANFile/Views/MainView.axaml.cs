@@ -1,14 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using Android.OS;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using BeaconLib;
 using LANFile.Models;
+using LANFile.Server;
 using LANFile.ViewModels;
- 
+
 
 namespace LANFile.Views;
 
@@ -17,6 +20,7 @@ public partial class MainView : UserControl
     private Beacon? _beacon = null;
     private Probe? _probe = null;
     private MainViewModel _mainViewModel;
+    private HttpServer _httpServer = new HttpServer();
 
     public MainView()
     {
@@ -26,7 +30,20 @@ public partial class MainView : UserControl
     protected override void OnLoaded(RoutedEventArgs e)
     {
         _mainViewModel = this.DataContext as MainViewModel;
+
+        _httpServer.OnHttpListenerResponse += OnHttpListenerResponse;
+        _httpServer.Start();
+
+
         base.OnLoaded(e);
+    }
+
+    private void OnHttpListenerResponse(HttpListenerRequest request, HttpListenerResponse response,
+        Dictionary<string, string> query, string httpMethod, Uri? userHostName)
+    {
+        
+        
+        
     }
 
 
@@ -35,17 +52,17 @@ public partial class MainView : UserControl
         DisposeAll();
         base.OnUnloaded(e);
     }
-    
+
     void DisposeAll()
     {
         _beacon?.Stop();
         _beacon?.Dispose();
         _probe?.Stop();
         _probe?.Dispose();
-        
+
         GC.SuppressFinalize(this);
         GC.Collect();
-        
+
         _probe = null;
         _beacon = null;
         _mainViewModel.Devices = new ObservableCollection<DeviceModel>();
@@ -91,10 +108,7 @@ public partial class MainView : UserControl
                     Console.WriteLine(beacon.Address + ": " + beacon.Data);
                 }
 
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    _mainViewModel.Devices = devices;
-                });
+                Dispatcher.UIThread.Invoke(() => { _mainViewModel.Devices = devices; });
             }
         };
 
