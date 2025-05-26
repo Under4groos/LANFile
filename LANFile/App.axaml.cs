@@ -2,8 +2,12 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+
+#if ANDROID || TARGET_ANDROID
 using Android.App;
 using Android.Net.Wifi;
+#endif
+
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
@@ -25,6 +29,7 @@ public class App : Application
 
     public static string GetLocalIPAddress()
     {
+#if ANDROID || TARGET_ANDROID
         try
         {
             if (OperatingSystem.IsAndroid())
@@ -35,24 +40,26 @@ public class App : Application
        
                 return ipAddr.ToString();
             }
-            
-
-
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    return ip.ToString();
-                }
-            }
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             
         }
-
+#endif
+        
+        6
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return ip.ToString();
+            }
+        }
+        
+        
+        
         throw new Exception("No network adapters with an IPv4 address in the system!");
     }
 
