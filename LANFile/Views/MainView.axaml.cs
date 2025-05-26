@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using BeaconLib;
 using LANFile.Models;
 using LANFile.ViewModels;
+ 
 
 namespace LANFile.Views;
 
@@ -37,10 +38,16 @@ public partial class MainView : UserControl
     
     void DisposeAll()
     {
+        _beacon?.Stop();
         _beacon?.Dispose();
-        _beacon = null;
+        _probe?.Stop();
         _probe?.Dispose();
+        
+        GC.SuppressFinalize(this);
+        GC.Collect();
+        
         _probe = null;
+        _beacon = null;
         _mainViewModel.Devices = new ObservableCollection<DeviceModel>();
         _mainViewModel.Title = App.NameApplication;
     }
