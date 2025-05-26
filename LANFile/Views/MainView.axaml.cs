@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using BeaconLib;
+using LANFile.ViewModels;
 
 namespace LANFile.Views;
 
@@ -37,5 +38,13 @@ public partial class MainView : UserControl
     {
         _beacon?.Dispose();
         base.OnUnloaded(e);
+    }
+
+    private void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (this.DataContext is MainViewModel mv)
+        {
+            mv.Refresh();
+        }
     }
 }

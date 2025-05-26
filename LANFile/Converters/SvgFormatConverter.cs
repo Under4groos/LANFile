@@ -4,7 +4,7 @@ using Avalonia.Data.Converters;
 
 namespace LANFile.Converters;
 
-public class SourceToVisibilityConverter : IValueConverter
+public class SvgFormatConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
