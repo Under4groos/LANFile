@@ -11,6 +11,7 @@ using BeaconLib;
 using LANFile.Models;
 using LANFile.Server;
 using LANFile.ViewModels;
+using SuperSimpleTcp;
 
 
 namespace LANFile.Views;
@@ -20,7 +21,8 @@ public partial class MainView : UserControl
     private Beacon? _beacon = null;
     private Probe? _probe = null;
     private MainViewModel _mainViewModel;
-    private HttpServer _httpServer = new HttpServer();
+    private SimpleTcpServer? _simpleTcp;
+    private SimpleTcpClient? _simpleTcpClient;
 
     public MainView()
     {
@@ -31,19 +33,32 @@ public partial class MainView : UserControl
     {
         _mainViewModel = this.DataContext as MainViewModel;
 
-        _httpServer.OnHttpListenerResponse += OnHttpListenerResponse;
-        _httpServer.Start();
-
+        var buttons = StackPanelTabs.Children.ToArray().Where(a => a.GetType() == typeof(Button)).Select(a => a as Button).ToArray();
+        foreach (var button in buttons)
+        {
+            button.Click += TabOnClick;
+        }
 
         base.OnLoaded(e);
     }
 
-    private void OnHttpListenerResponse(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> query, string httpMethod, Uri? userHostName)
+    private void TabOnClick(object? sender, RoutedEventArgs e)
     {
-        
-        
-        
+        if (sender is Button button && button.Tag is string tag)
+        {
+            foreach (var tabsChild in Tabs.Children)
+            {
+                if (tabsChild.Tag == tag)
+                {
+                    tabsChild.IsVisible = true;
+                }
+                else
+                {
+                    tabsChild.IsVisible = false;
+                }
+            }
+        }
+       
     }
 
 
@@ -59,7 +74,11 @@ public partial class MainView : UserControl
         _beacon?.Dispose();
         _probe?.Stop();
         _probe?.Dispose();
-
+        
+        _simpleTcp?.DisconnectClient($"{_simpleTcp.IpAddress}:{_simpleTcp.Port}" );
+        _simpleTcp?.Dispose();
+        
+        
         GC.SuppressFinalize(this);
         GC.Collect();
 
@@ -116,13 +135,37 @@ public partial class MainView : UserControl
         _probe?.BeginReceived();
     }
 
+    private void ClientEventsOnConnected(object? sender, ConnectionEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
     private void ButtonClickBeacon(object? sender, RoutedEventArgs e)
     {
         DisposeAll();
+        _simpleTcp = new SimpleTcpServer($"{App.GetLocalIPAddress()}:9000");
+        _simpleTcp.Events.ClientConnected += ServerEventsOnClientConnected;
+        _simpleTcp.Events.ClientDisconnected += (o, args) =>
+        {
+            LogAdd($"[{args.IpPort}] client disconnected");
+        };
+        _simpleTcp.Events.DataReceived += (o, args) =>
+        {
+            LogAdd($"[{args.IpPort}]: {System.Text.Encoding.UTF8.GetString(args.Data)}");
+        };
+        _simpleTcp.Start();
+        LogAdd($"Starting client {_simpleTcp.IpAddress}:{_simpleTcp.Port}");
 
         _beacon = new Beacon(nameof(MainView), (ushort)(4000 + App.R.Next(0, 400)));
         _beacon.BeaconData = $"{App.Platform}-{App.NameApplication}";
         _beacon?.Start();
+    }
+
+    private void ServerEventsOnClientConnected(object? sender, ConnectionEventArgs e)
+    {
+        Console.WriteLine($"[{e.IpPort}] client connected");
+        LogAdd($"[{e.IpPort}] client connected");
+        _simpleTcp?.Send(e.IpPort, "Hello, world!");
     }
 
     private void ButtonClickDispose(object? sender, RoutedEventArgs e)
@@ -134,5 +177,11 @@ public partial class MainView : UserControl
     {
         DisposeAll();
         _mainViewModel.Random();
+    }
+
+    private void LogAdd(string? message)
+    {
+        Dispatcher.UIThread.Invoke(() => {  logconsole.Children.Add(new TextBlock(){Text = message}); });
+       
     }
 }

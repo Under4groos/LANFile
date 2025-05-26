@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:LANFile.ViewModels"
              xmlns:controls="clr-namespace:LANFile.Views.Controls"
+             xmlns:avRichTextBox="clr-namespace:AvRichTextBox;assembly=AvRichTextBox"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LANFile.Views.MainView"
              Background="#1e1e1e"
@@ -17,16 +18,18 @@
                 <Border Classes="VerticalM1 BorderM1">
                     <Grid>
                         <ScrollViewer>
-                            <StackPanel>
+                            <StackPanel Name="StackPanelTabs">
                                 <Button
                                     Classes="SegoeFluent Min40"
                                     Content="&#xe700;" />
                                 <Button
+                                    Tag="BorderDebiveList"
                                     Classes="SegoeFluent Min40"
-                                    Content="&#xe701;" />
+                                    Content="&#xe753;" />
                                 <Button
+                                    Tag="console"
                                     Classes="SegoeFluent Min40"
-                                    Content="&#xe705;" />
+                                    Content="&#xe756;" />
                             </StackPanel>
                         </ScrollViewer>
                         <ScrollViewer VerticalAlignment="Bottom">
@@ -44,47 +47,61 @@
         <Grid Grid.Column="1" Margin="0,5,5,5">
             <Grid RowDefinitions="*,Auto">
                 <Border Grid.Row="0" Classes="BorderM1" Margin="0,0,0,4">
-                    <Grid RowDefinitions="Auto,*">
-                        <Grid Grid.Row="0">
-                           <Border Margin="4" Classes="BorderM1">
-                               <WrapPanel Margin="8" Orientation="Horizontal">
-                                   <TextBlock Classes="F14L" 
-                                              Text="Name:" Padding="0">
-                                   </TextBlock>
-                                   <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"   Text="{Binding Title }"></TextBlock>
-                               </WrapPanel>
-                           </Border>
+                    <Grid Name="Tabs">
+                        <Grid IsVisible="False" Tag="BorderDebiveList" RowDefinitions="Auto,*">
+                            <Grid Grid.Row="0">
+                                <Border Margin="4" Classes="BorderM1">
+                                    <WrapPanel Margin="8" Orientation="Horizontal">
+                                        <TextBlock Classes="F14L"
+                                                   Text="Name:" Padding="0">
+                                        </TextBlock>
+                                        <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
+                                                   Text="{Binding Title }">
+                                        </TextBlock>
+                                    </WrapPanel>
+                                </Border>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+
+                                    <ItemsControl ItemsSource="{Binding  Devices}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel>
+                                                    <VirtualizingStackPanel Orientation="Vertical" />
+
+                                                </StackPanel>
+
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+
+                                                <controls:LanDevice Theme="{StaticResource LanDevice}"
+                                                                    ConnectName="{Binding Name}"
+                                                                    Os="{Binding Os}"
+                                                                    Port="{Binding Port}"
+                                                                    Host="{Binding Host}" />
+
+
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                </ScrollViewer>
+
+
+                            </Grid>
+
+
                         </Grid>
-
-                        <ScrollViewer VerticalScrollBarVisibility="Hidden" Grid.Row="1">
-
-                            <ItemsControl ItemsSource="{Binding  Devices}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel>
-                                            <VirtualizingStackPanel Orientation="Vertical" />
-
-                                        </StackPanel>
-
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-
-                                        <controls:LanDevice Theme="{StaticResource LanDevice}"
-                                                            ConnectName="{Binding Name}"
-                                                            Os="{Binding Os}"
-                                                            Port="{Binding Port}"
-                                                            Host="{Binding Host}" />
-
-
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                        </ScrollViewer>
-
-
+                        <Grid  Tag="console"  >
+                            <ScrollViewer>
+                                <StackPanel x:Name="logconsole" Orientation="Vertical">
+                                     
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
                     </Grid>
                 </Border>
                 <Border Grid.Row="1" Classes="BorderM1">

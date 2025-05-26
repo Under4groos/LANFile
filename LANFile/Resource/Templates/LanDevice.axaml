@@ -38,6 +38,11 @@
                                     Tag="ping"
                                     Classes="Base"
                                     Content="Ping" />
+
+                                <Button
+                                    Tag="tcp"
+                                    Classes="Base"
+                                    Content="Tcp send MSG" />
                                 <Label Classes="F14L" VerticalContentAlignment="Center"
                                        Content="{TemplateBinding Ping}"/>
                                 

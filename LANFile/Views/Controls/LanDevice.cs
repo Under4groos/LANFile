@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reactive.Concurrency;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -10,6 +11,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using LANFile.Helper;
 using LANFile.Models;
+using SuperSimpleTcp;
 
 namespace LANFile.Views.Controls;
 
@@ -75,7 +77,7 @@ public class LanDevice : ContentControl
 
     private WrapPanel? _wrapPanel;
     private Thread? _thread;
-
+    private SimpleTcpClient? _simpleTcpClient;
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -90,6 +92,14 @@ public class LanDevice : ContentControl
         }
     }
 
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        _simpleTcpClient?.Disconnect();
+        _simpleTcpClient?.Dispose();
+        _simpleTcpClient = null;
+        base.OnUnloaded(e);
+    }
+
     private void ButtonOnClick(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button button)
@@ -99,7 +109,43 @@ public class LanDevice : ContentControl
         switch (button.Tag)
         {
             case "send":
+    
+                break;
+            case "tcp":
+            {
+                try
+                {
+                    if (_simpleTcpClient != null)
+                    {
+                        if (_simpleTcpClient.IsConnected)
+                        {
+                            _simpleTcpClient.Send("Hello, world!");
+                        }
+                        else
+                        {
+                            _simpleTcpClient?.Dispose();
+                            _simpleTcpClient = null;
+                        }
+                    }
+                    if(_simpleTcpClient == null)
+                    {
+                        _simpleTcpClient = new SimpleTcpClient($"{Host}:9000");
 
+                        _simpleTcpClient.Connect();
+                    
+                        
+                    }
+                      
+                  
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                   
+                }
+            }
+                
+                
                 break;
             case "ping":
                 this.Ping = "...";

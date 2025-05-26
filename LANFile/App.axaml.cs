@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using Android.App;
 using Android.OS;
 using Avalonia;
@@ -15,14 +17,22 @@ namespace LANFile;
 public class App : Application
 {
     public static Random R = new Random();
-
     public static string NameApplication { get; set; } = $"{Guid.NewGuid().ToString().Substring(0,9)}";
-        
-
-    
     public static string Platform { get; set; } =
         $"{(OperatingSystem.IsAndroid() ? "Android" : "Windows")}";
     
+    public static string GetLocalIPAddress()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return ip.ToString();
+            }
+        }
+        throw new Exception("No network adapters with an IPv4 address in the system!");
+    }
     
     public override void Initialize()
     {
