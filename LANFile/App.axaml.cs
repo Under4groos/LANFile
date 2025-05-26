@@ -16,7 +16,7 @@ public class App : Application
 {
     public static Random R = new Random();
 
-    public static string NameApplication { get; set; }
+    public static string NameApplication { get; set; } = $"{Guid.NewGuid().ToString().Substring(0,9)}";
         
 
     
@@ -26,18 +26,6 @@ public class App : Application
     
     public override void Initialize()
     {
-        if (OperatingSystem.IsAndroid())
-        {
-            NameApplication = $"{Build.Model ?? "Error"}";
-        }
-        else
-        {
-            NameApplication = $"{System.Security.Principal.WindowsIdentity.GetCurrent().Name}";
-        }
-
-        NameApplication += $"_{Guid.NewGuid().ToString().Substring(5)}";
-        
-        
         AvaloniaXamlLoader.Load(this);
     }
 

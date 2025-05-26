@@ -1,5 +1,8 @@
-﻿using Avalonia;
+﻿using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using LANFile.Helper;
 using LANFile.Models;
 
 namespace LANFile.Views.Controls;
@@ -39,5 +42,23 @@ public class LanDevice : ContentControl
     {
         get => GetValue(HostProperty);
         set => SetValue(HostProperty, value);
+    }
+
+    private WrapPanel? _wrapPanel;
+    
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        
+        base.OnApplyTemplate(e);
+        
+        
+        _wrapPanel = ControlHelper.FindTemplateControlByName<WrapPanel>(this, "WrapPanel");
+        if (_wrapPanel != null)
+        {
+            foreach (var button in  _wrapPanel.Children)
+            {
+                
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Android.OS;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -14,6 +15,7 @@ public partial class MainView : UserControl
 {
     private Beacon? _beacon = null;
     private Probe? _probe = null;
+    private MainViewModel _mainViewModel;
 
     public MainView()
     {
@@ -22,26 +24,25 @@ public partial class MainView : UserControl
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
+        _mainViewModel = this.DataContext as MainViewModel;
         base.OnLoaded(e);
     }
+
 
     protected override void OnUnloaded(RoutedEventArgs e)
     {
         DisposeAll();
         base.OnUnloaded(e);
     }
-
+    
     void DisposeAll()
     {
         _beacon?.Dispose();
         _beacon = null;
         _probe?.Dispose();
         _probe = null;
-
-        if (this.DataContext is MainViewModel vm)
-        {
-            vm.Devices = new ObservableCollection<DeviceModel>();
-        }
+        _mainViewModel.Devices = new ObservableCollection<DeviceModel>();
+        _mainViewModel.Title = App.NameApplication;
     }
 
 
@@ -62,7 +63,7 @@ public partial class MainView : UserControl
             ObservableCollection<DeviceModel> devices = [];
             if (beacons.Any())
             {
-                foreach (var beacon in beacons.Where(b => !string.IsNullOrEmpty(b.Data)).ToArray() )
+                foreach (var beacon in beacons.Where(b => !string.IsNullOrEmpty(b.Data)).ToArray())
                 {
                     string[] spData = beacon.Data.Split("-");
                     if (spData.Length < 2)
@@ -82,18 +83,12 @@ public partial class MainView : UserControl
 
                     Console.WriteLine(beacon.Address + ": " + beacon.Data);
                 }
-                
+
                 Dispatcher.UIThread.Invoke(() =>
                 {
-                    if (this.DataContext is MainViewModel vm)
-                    {
-                        vm.Devices = devices;
-                    }
+                    _mainViewModel.Devices = devices;
                 });
             }
-
-
-            
         };
 
         _probe?.Start();
@@ -103,7 +98,7 @@ public partial class MainView : UserControl
     private void ButtonClickBeacon(object? sender, RoutedEventArgs e)
     {
         DisposeAll();
-       
+
         _beacon = new Beacon(nameof(MainView), (ushort)(4000 + App.R.Next(0, 400)));
         _beacon.BeaconData = $"{App.Platform}-{App.NameApplication}";
         _beacon?.Start();
@@ -112,5 +107,11 @@ public partial class MainView : UserControl
     private void ButtonClickDispose(object? sender, RoutedEventArgs e)
     {
         DisposeAll();
+    }
+
+    private void ButtonClickRandom(object? sender, RoutedEventArgs e)
+    {
+        DisposeAll();
+        _mainViewModel.Random();
     }
 }

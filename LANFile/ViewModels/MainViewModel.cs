@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Android.OS;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LANFile.Models;
 
@@ -8,16 +9,16 @@ namespace LANFile.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    [ObservableProperty] private string _greeting = "Welcome to Avalonia!";
+    [ObservableProperty] private string? _Title;
     [ObservableProperty] private ObservableCollection<DeviceModel> _devices = [];
 
 
     public MainViewModel()
     {
-        
+        this.Title = "LANFile-Debug";
+        Random();
     }
-
-    public void Refresh()
+    public void Random()
     {
         ObservableCollection<DeviceModel> devices = [];
         for (var i = 0; i < 15; i++)
