@@ -73,7 +73,7 @@ public partial class MainView : UserControl
                     string plaatform = spData[0];
                     devices.Add(new DeviceModel()
                     {
-                        Host = beacon.Address.ToString(),
+                        Host = beacon.Address.Address.ToString(),
                         Name = deviceName,
                         Os = $"{plaatform.ToLower()}",
                         Port = beacon.Address.Port.ToString(),

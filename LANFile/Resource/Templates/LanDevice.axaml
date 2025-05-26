@@ -33,11 +33,14 @@
                                     Tag="send"
                                     Classes="Base"
                                     Content="Send file" />
+
                                 <Button
                                     Tag="ping"
                                     Classes="Base"
                                     Content="Ping" />
-
+                                <Label Classes="F14L" VerticalContentAlignment="Center"
+                                       Content="{TemplateBinding Ping}">
+                                </Label>
                             </WrapPanel>
                         </StackPanel>
                     </Grid>
