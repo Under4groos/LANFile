@@ -48,7 +48,7 @@
             <Grid RowDefinitions="*,Auto">
                 <Border Grid.Row="0" Classes="BorderM1" Margin="0,0,0,4">
                     <Grid Name="Tabs">
-                        <Grid IsVisible="False" Tag="BorderDebiveList" RowDefinitions="Auto,*">
+                        <Grid IsVisible="True" Tag="BorderDebiveList" RowDefinitions="Auto,*">
                             <Grid Grid.Row="0">
                                 <Border Margin="4" Classes="BorderM1">
                                     <WrapPanel Margin="8" Orientation="Horizontal">
@@ -57,6 +57,9 @@
                                         </TextBlock>
                                         <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
                                                    Text="{Binding Title }">
+                                        </TextBlock>
+                                        <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
+                                                   Text="{Binding Host }">
                                         </TextBlock>
                                     </WrapPanel>
                                 </Border>
@@ -95,7 +98,7 @@
 
 
                         </Grid>
-                        <Grid  Tag="console"  >
+                        <Grid IsVisible="False" Tag="console"  >
                             <ScrollViewer>
                                 <StackPanel x:Name="logconsole" Orientation="Vertical">
                                      

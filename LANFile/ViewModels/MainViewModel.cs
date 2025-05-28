@@ -10,6 +10,7 @@ namespace LANFile.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty] private string? _Title;
+    [ObservableProperty] private string? _Host;
     [ObservableProperty] private ObservableCollection<DeviceModel> _devices = [];
 
 

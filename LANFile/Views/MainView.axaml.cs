@@ -23,7 +23,7 @@ public partial class MainView : UserControl
     private MainViewModel _mainViewModel;
     private SimpleTcpServer? _simpleTcp;
     private SimpleTcpClient? _simpleTcpClient;
-
+    private IPAddress _ipAddress;
     public MainView()
     {
         InitializeComponent();
@@ -31,14 +31,19 @@ public partial class MainView : UserControl
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
-        _mainViewModel = this.DataContext as MainViewModel;
+        _mainViewModel = (this.DataContext as MainViewModel)?? new MainViewModel();
 
-        var buttons = StackPanelTabs.Children.ToArray().Where(a => a.GetType() == typeof(Button)).Select(a => a as Button).ToArray();
-        foreach (var button in buttons)
+        var buttons = StackPanelTabs.Children.ToArray().Where(a => a.GetType() == typeof(Button))
+            .Select(a => a as Button).ToArray();
+        foreach (Button button in buttons)
         {
             button.Click += TabOnClick;
         }
-
+        _ipAddress = App.GetWindowsIPAddresses().Last();
+        if (!_ipAddress.ToString().StartsWith("192.168."))
+            _ipAddress = App.GetAndroidIPAddresses();
+        
+        _mainViewModel.Host = _ipAddress.ToString();
         base.OnLoaded(e);
     }
 
@@ -58,7 +63,6 @@ public partial class MainView : UserControl
                 }
             }
         }
-       
     }
 
 
@@ -74,16 +78,19 @@ public partial class MainView : UserControl
         _beacon?.Dispose();
         _probe?.Stop();
         _probe?.Dispose();
-        
-        _simpleTcp?.DisconnectClient($"{_simpleTcp.IpAddress}:{_simpleTcp.Port}" );
+
+        _simpleTcp?.DisconnectClient($"{_simpleTcp.IpAddress}:{_simpleTcp.Port}");
+        _simpleTcp?.Stop();
         _simpleTcp?.Dispose();
-        
-        
-        GC.SuppressFinalize(this);
-        GC.Collect();
+
 
         _probe = null;
         _beacon = null;
+        _simpleTcp = null;
+
+        GC.SuppressFinalize(this);
+        GC.Collect();
+
         _mainViewModel.Devices = new ObservableCollection<DeviceModel>();
         _mainViewModel.Title = App.NameApplication;
     }
@@ -99,8 +106,8 @@ public partial class MainView : UserControl
     {
         DisposeAll();
 
-
-        _probe = new Probe(nameof(MainView));
+       
+        _probe = new Probe(nameof(MainView), IPAddress.Any);
         _probe.BeaconsUpdated += (beacons) =>
         {
             ObservableCollection<DeviceModel> devices = [];
@@ -135,20 +142,17 @@ public partial class MainView : UserControl
         _probe?.BeginReceived();
     }
 
-    private void ClientEventsOnConnected(object? sender, ConnectionEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
+   
 
     private void ButtonClickBeacon(object? sender, RoutedEventArgs e)
     {
         DisposeAll();
-        _simpleTcp = new SimpleTcpServer($"{App.GetLocalIPAddress()}:9000");
+        
+       
+
+        _simpleTcp = new SimpleTcpServer($"{_ipAddress.ToString()}:9000");
         _simpleTcp.Events.ClientConnected += ServerEventsOnClientConnected;
-        _simpleTcp.Events.ClientDisconnected += (o, args) =>
-        {
-            LogAdd($"[{args.IpPort}] client disconnected");
-        };
+        _simpleTcp.Events.ClientDisconnected += (o, args) => { LogAdd($"[{args.IpPort}] client disconnected"); };
         _simpleTcp.Events.DataReceived += (o, args) =>
         {
             LogAdd($"[{args.IpPort}]: {System.Text.Encoding.UTF8.GetString(args.Data)}");
@@ -156,7 +160,11 @@ public partial class MainView : UserControl
         _simpleTcp.Start();
         LogAdd($"Starting client {_simpleTcp.IpAddress}:{_simpleTcp.Port}");
 
-        _beacon = new Beacon(nameof(MainView), (ushort)(4000 + App.R.Next(0, 400)));
+      
+        
+ 
+
+        _beacon = new Beacon(nameof(MainView), (ushort)(4000 + App.R.Next(0, 400)), _ipAddress);
         _beacon.BeaconData = $"{App.Platform}-{App.NameApplication}";
         _beacon?.Start();
     }
@@ -181,7 +189,6 @@ public partial class MainView : UserControl
 
     private void LogAdd(string? message)
     {
-        Dispatcher.UIThread.Invoke(() => {  logconsole.Children.Add(new TextBlock(){Text = message}); });
-       
+        Dispatcher.UIThread.Invoke(() => { logconsole.Children.Add(new TextBlock() { Text = message }); });
     }
 }

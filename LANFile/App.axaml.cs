@@ -2,12 +2,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-
-#if ANDROID || TARGET_ANDROID
-using Android.App;
-using Android.Net.Wifi;
-#endif
-
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
@@ -34,7 +28,8 @@ public class App : Application
         {
             if (OperatingSystem.IsAndroid())
             {
-                WifiManager wifiManager = (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
+                WifiManager wifiManager =
+ (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
                 int ipaddress = wifiManager.ConnectionInfo.IpAddress;
                 IPAddress ipAddr = new IPAddress(ipaddress);
        
@@ -47,22 +42,50 @@ public class App : Application
             
         }
 #endif
-        
-        6
-        var host = Dns.GetHostEntry(Dns.GetHostName());
-        foreach (var ip in host.AddressList)
-        {
-            if (ip.AddressFamily == AddressFamily.InterNetwork)
-            {
-                return ip.ToString();
-            }
-        }
-        
-        
-        
-        throw new Exception("No network adapters with an IPv4 address in the system!");
+
+        var adressList = GetWindowsIPAddresses();
+        if (adressList.Any())
+            return adressList.First().ToString();
+        return string.Empty;
     }
 
+    public static IPAddress GetAndroidIPAddresses()
+    {
+
+// #if ANDROID
+//     ipAddress = App.GetAndroidIPAddresses()
+// #endif
+//         
+// #if TARGET_ANDROID
+//     ipAddress = App.GetAndroidIPAddresses()
+// #endif
+        
+        try
+        {
+            
+            Android.Net.Wifi.WifiManager wifiManager =
+ (Android.Net.Wifi.WifiManager)Android.App.Application.Context.GetSystemService(Android.App.Service.WifiService);
+                int ipaddress = wifiManager.ConnectionInfo.IpAddress;
+                IPAddress ipAddr = new IPAddress(ipaddress);
+       
+                return ipAddr;
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            
+        }
+ 
+        return default;
+    }
+    public static IPAddress[] GetWindowsIPAddresses()
+    {
+        return Dns.GetHostEntry(Dns.GetHostName()).AddressList
+            .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToArray();
+    }
+    
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);

@@ -19,7 +19,7 @@ public class Beacon : IDisposable
     internal const int DiscoveryPort = 35891;
     private readonly UdpClient udp;
 
-    public Beacon(string beaconType, ushort advertisedPort)
+    public Beacon(string beaconType, ushort advertisedPort , IPAddress addres )
     {
         BeaconType = beaconType;
         AdvertisedPort = advertisedPort;
@@ -27,8 +27,13 @@ public class Beacon : IDisposable
 
         udp = new UdpClient();
         udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        udp.Client.Bind(new IPEndPoint(IPAddress.Any, DiscoveryPort));
 
+
+       
+        udp.Client.Bind(new IPEndPoint(addres, DiscoveryPort));
+
+        
+        
         #region TARGET_WINDOWS
 
         try

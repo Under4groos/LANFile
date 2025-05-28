@@ -28,14 +28,15 @@ public class Probe : IDisposable
 
     private bool running = true;
 
-    public Probe(string beaconType , bool isBackground = false)
+    public Probe(string beaconType , IPAddress endAny = null  , bool isBackground = false )
     {
         udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
         BeaconType = beaconType;
         thread = new Thread(BackgroundLoop) { IsBackground = isBackground };
 
-        udp.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
+        //    udp.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
+        udp.Client.Bind( new IPEndPoint(endAny , 0) );
 
 
         #region TARGET_WINDOWS
