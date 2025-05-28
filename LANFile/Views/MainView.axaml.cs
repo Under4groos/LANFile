@@ -107,7 +107,7 @@ public partial class MainView : UserControl
         DisposeAll();
 
        
-        _probe = new Probe(nameof(MainView), IPAddress.Any);
+        _probe = new Probe(nameof(MainView), IPAddress.Any );
         _probe.BeaconsUpdated += (beacons) =>
         {
             ObservableCollection<DeviceModel> devices = [];
@@ -164,7 +164,7 @@ public partial class MainView : UserControl
         
  
 
-        _beacon = new Beacon(nameof(MainView), (ushort)(4000 + App.R.Next(0, 400)), _ipAddress);
+        _beacon = new Beacon(nameof(MainView), (ushort)(4000 + App.R.Next(0, 400)), IPAddress.Any);
         _beacon.BeaconData = $"{App.Platform}-{App.NameApplication}";
         _beacon?.Start();
     }

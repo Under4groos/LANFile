@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BeaconLib;
 
@@ -21,29 +22,26 @@ public class Probe : IDisposable
     /// </summary>
     private static readonly TimeSpan BeaconTimeout = new(0, 0, 0, 5); // seconds
 
-    private readonly Thread thread;
-    private readonly UdpClient udp = new();
-    private readonly EventWaitHandle waitHandle = new(false, EventResetMode.AutoReset);
-    private IEnumerable<BeaconLocation> currentBeacons = Enumerable.Empty<BeaconLocation>();
+    private Task _mainTask;
+    private readonly UdpClient _udp = new();
+    private readonly EventWaitHandle _waitHandle = new(false, EventResetMode.AutoReset);
+    private IEnumerable<BeaconLocation> _currentBeacons = Enumerable.Empty<BeaconLocation>();
 
-    private bool running = true;
 
-    public Probe(string beaconType , IPAddress endAny = null  , bool isBackground = false )
+    private CancellationTokenSource _cancellationTokenSource;
+    private CancellationToken _cancellationToken;
+
+    public Probe(string beaconType, IPAddress endAny = null, bool isBackground = false)
     {
-        udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-
+        _udp.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         BeaconType = beaconType;
-        thread = new Thread(BackgroundLoop) { IsBackground = isBackground };
-
-        //    udp.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
-        udp.Client.Bind( new IPEndPoint(endAny , 0) );
-
+        if (endAny != null) _udp.Client.Bind(new IPEndPoint(endAny, 0));
 
         #region TARGET_WINDOWS
 
         try
         {
-            udp.AllowNatTraversal(true);
+            _udp.AllowNatTraversal(true);
         }
         catch (Exception ex)
         {
@@ -52,8 +50,10 @@ public class Probe : IDisposable
 
         #endregion
 
+        _udp.BeginReceive(ResponseReceived, null);
 
-        udp.BeginReceive(ResponseReceived, null);
+        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationToken = _cancellationTokenSource.Token;
     }
 
     public string BeaconType { get; }
@@ -74,13 +74,33 @@ public class Probe : IDisposable
 
     public void Start()
     {
-        thread.Start();
+        _mainTask = Task.Run(async () =>
+        {
+            while (!_cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    BroadcastProbe();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+
+                await Task.Delay(2000, _cancellationToken);
+                PruneBeacons();
+            }
+
+            Console.WriteLine($"{_cancellationTokenSource.Token} stopped.");
+        }, _cancellationToken);
     }
 
     private void ResponseReceived(IAsyncResult ar)
     {
+        if(_cancellationToken.IsCancellationRequested || _udp.Client == null)
+            return;
         var remote = new IPEndPoint(IPAddress.Any, 0);
-        var bytes = udp.EndReceive(ar, ref remote);
+        var bytes = _udp.EndReceive(ar, ref remote);
 
         var typeBytes = Beacon.Encode(BeaconType).ToList();
         Debug.WriteLine(string.Join(", ", typeBytes.Select(_ => (char)_)));
@@ -96,52 +116,43 @@ public class Probe : IDisposable
             {
                 Debug.WriteLine(ex);
             }
-
-        // BeginReceived();
     }
+
     public void BeginReceived()
     {
-        udp.BeginReceive(ResponseReceived, null);
-    }
-    private void BackgroundLoop()
-    {
-        while (running)
+        try
         {
-            try
-            {
-                BroadcastProbe();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-
-            waitHandle.WaitOne(2000);
-            PruneBeacons();
+            _udp.BeginReceive(ResponseReceived, null);
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            
+        }
+        
     }
 
     private void BroadcastProbe()
     {
         var probe = Beacon.Encode(BeaconType).ToArray();
-        udp.Send(probe, probe.Length, new IPEndPoint(IPAddress.Broadcast, Beacon.DiscoveryPort));
+        _udp.Send(probe, probe.Length, new IPEndPoint(IPAddress.Broadcast, Beacon.DiscoveryPort));
     }
 
     private void PruneBeacons()
     {
         var cutOff = DateTime.Now - BeaconTimeout;
-        var oldBeacons = currentBeacons.ToList();
+        var oldBeacons = _currentBeacons.ToList();
         var newBeacons = oldBeacons.Where(_ => _.LastAdvertised >= cutOff).ToList();
         if (EnumsEqual(oldBeacons, newBeacons)) return;
 
         var u = BeaconsUpdated;
         if (u != null) u(newBeacons);
-        currentBeacons = newBeacons;
+        _currentBeacons = newBeacons;
     }
 
     private void NewBeacon(BeaconLocation newBeacon)
     {
-        var newBeacons = currentBeacons
+        var newBeacons = _currentBeacons
             .Where(_ => !_.Equals(newBeacon))
             .Concat(new[] { newBeacon })
             .OrderBy(_ => _.Data)
@@ -149,7 +160,7 @@ public class Probe : IDisposable
             .ToList();
         var u = BeaconsUpdated;
         if (u != null) u(newBeacons);
-        currentBeacons = newBeacons;
+        _currentBeacons = newBeacons;
     }
 
     private static bool EnumsEqual<T>(IEnumerable<T> xs, IEnumerable<T> ys)
@@ -159,8 +170,7 @@ public class Probe : IDisposable
 
     public void Stop()
     {
-        running = false;
-        waitHandle.Set();
-        thread.Join();
+        _cancellationTokenSource.Cancel();
+        _udp?.Dispose();
     }
 }

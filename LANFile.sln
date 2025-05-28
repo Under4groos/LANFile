@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaconLib", "BeaconLib\BeaconLib.csproj", "{650B310F-17C3-4B12-8496-9B670A47A811}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperSimpleTcp", "SuperSimpleTcp\SuperSimpleTcp.csproj", "{F6EFA9B9-A71B-4323-B3BF-408429FA0EB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{650B310F-17C3-4B12-8496-9B670A47A811}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{650B310F-17C3-4B12-8496-9B670A47A811}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{650B310F-17C3-4B12-8496-9B670A47A811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6EFA9B9-A71B-4323-B3BF-408429FA0EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6EFA9B9-A71B-4323-B3BF-408429FA0EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6EFA9B9-A71B-4323-B3BF-408429FA0EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6EFA9B9-A71B-4323-B3BF-408429FA0EB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

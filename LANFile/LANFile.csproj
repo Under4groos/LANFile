@@ -22,11 +22,11 @@
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Simplecto.Avalonia.RichTextBox" />
-        <PackageReference Include="SuperSimpleTcp" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\BeaconLib\BeaconLib.csproj" />
+        <ProjectReference Include="..\SuperSimpleTcp\SuperSimpleTcp.csproj" />
     </ItemGroup>
 
     <ItemGroup>
