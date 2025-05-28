@@ -15,10 +15,9 @@
                 <ResourceInclude Source="/Resource/Colors.axaml" />
                 <ResourceInclude Source="/Resource/Templates/Button.axaml" />
                 <ResourceInclude Source="/Resource/Templates/LanDevice.axaml" />
-               
+                <ResourceInclude Source="/Resource/Templates/SelectFiles.axaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:SvgFormatConverter x:Key="SvgFormatConverter" />
-
         </ResourceDictionary>
         <FontFamily x:Key="Segoe">avares://LANFile/Assets/Fonts#Segoe Fluent Icons</FontFamily>
     </Application.Resources>

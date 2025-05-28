@@ -1,4 +1,41 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Add Resources Here -->
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:LANFile.Views.Controls">
+    <ControlTheme x:Key="SelectFiles" TargetType="controls:SelectFiles">
+        <Setter Property="Background" Value="{StaticResource Button.Base}" />
+        <Setter Property="Foreground" Value="#ffffff" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="*,Auto">
+                    <Grid >
+                        <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                            <ItemsControl ItemsSource="{TemplateBinding Files}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel>
+                                            <VirtualizingStackPanel Orientation="Vertical" />
+                                        </StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"></TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                        </ScrollViewer>
+
+                    </Grid>
+                    <Button Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            x:Name="ButtonSelectFile" Content="Select file">
+                    </Button>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
 </ResourceDictionary>
