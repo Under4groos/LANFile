@@ -9,83 +9,15 @@ using LANFile.ViewModels;
 using LANFile.Views;
 using Application = Avalonia.Application;
 
- 
 
 namespace LANFile;
 
 public class App : Application
 {
-    public static Random R = new Random();
-    public static string NameApplication { get; set; } = $"{Guid.NewGuid().ToString().Substring(0, 9)}";
-
-    public static string Platform { get; set; } =
-        $"{(OperatingSystem.IsAndroid() ? "Android" : "Windows")}";
-
-    public static string GetLocalIPAddress()
-    {
-#if ANDROID || TARGET_ANDROID
-        try
-        {
-            if (OperatingSystem.IsAndroid())
-            {
-                WifiManager wifiManager =
- (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
-                int ipaddress = wifiManager.ConnectionInfo.IpAddress;
-                IPAddress ipAddr = new IPAddress(ipaddress);
-       
-                return ipAddr.ToString();
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            
-        }
-#endif
-
-        var adressList = GetWindowsIPAddresses();
-        if (adressList.Any())
-            return adressList.First().ToString();
-        return string.Empty;
-    }
-
-    public static IPAddress GetAndroidIPAddresses()
-    {
-
-// #if ANDROID
-//     ipAddress = App.GetAndroidIPAddresses()
-// #endif
-//         
-// #if TARGET_ANDROID
-//     ipAddress = App.GetAndroidIPAddresses()
-// #endif
-        
-        try
-        {
-            
-            Android.Net.Wifi.WifiManager wifiManager =
- (Android.Net.Wifi.WifiManager)Android.App.Application.Context.GetSystemService(Android.App.Service.WifiService);
-                int ipaddress = wifiManager.ConnectionInfo.IpAddress;
-                IPAddress ipAddr = new IPAddress(ipaddress);
-       
-                return ipAddr;
-            
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            
-        }
- 
-        return default;
-    }
-    public static IPAddress[] GetWindowsIPAddresses()
-    {
-        return Dns.GetHostEntry(Dns.GetHostName()).AddressList
-            .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToArray();
-    }
+   
     
-    
+
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);

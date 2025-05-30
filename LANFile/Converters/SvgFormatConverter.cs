@@ -8,10 +8,7 @@ public class SvgFormatConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is string s)
-        {
-            return $"/Assets/Svg/{s}.svg";
-        }
+        if (value is string s) return $"/Assets/Svg/{s}.svg";
 
         return string.Empty;
     }

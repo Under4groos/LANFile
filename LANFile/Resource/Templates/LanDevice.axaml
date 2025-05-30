@@ -2,7 +2,12 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:LANFile.Views.Controls">
     <ControlTheme x:Key="LanDevice" TargetType="controls:LanDevice">
-        <Setter Property="Background" Value="{StaticResource Button.Base}" />
+
+        <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThemeThickness}" />
+        
+        
         <Setter Property="Foreground" Value="#ffffff" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Margin" Value="0" />
@@ -10,7 +15,11 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Classes="Base BorderM1" MinHeight="30" Margin="4,0,0,4">
+                <Border Classes="Base BorderM1" MinHeight="30" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        Background="{TemplateBinding Background}"
+                        
+                        Margin="0,2,0,2" >
                     <Grid ColumnDefinitions="50,*">
                         <Grid Grid.Column="0">
                             <Svg Margin="10" Path="{TemplateBinding Os,Converter={StaticResource SvgFormatConverter}}" />
@@ -44,12 +53,12 @@
                                     Classes="Base"
                                     Content="Tcp send MSG" />
                                 <Label Classes="F14L" VerticalContentAlignment="Center"
-                                       Content="{TemplateBinding Ping}"/>
-                                
+                                       Content="{TemplateBinding Ping}" />
+
                                 <Label Classes="F14L" VerticalContentAlignment="Center"
-                                       Content="{TemplateBinding HttpResult}"/>
-                                    
-                               
+                                       Content="{TemplateBinding HttpResult}" />
+
+
                             </WrapPanel>
                         </StackPanel>
                     </Grid>

@@ -47,12 +47,8 @@ public class SelectFiles : ContentControl
             Title = "Select files",
             AllowMultiple = true
         });
-        ObservableCollection<string> _files = new ObservableCollection<string>();
-        foreach (var file in files.Select(f => f.Path.AbsolutePath).ToArray())
-        {
-            _files.Add(file);
-             
-        }
+        var _files = new ObservableCollection<string>();
+        foreach (var file in files.Select(f => f.Path.AbsolutePath).ToArray()) _files.Add(file);
         Files = _files;
     }
 }

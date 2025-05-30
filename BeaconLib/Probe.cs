@@ -97,7 +97,7 @@ public class Probe : IDisposable
 
     private void ResponseReceived(IAsyncResult ar)
     {
-        if(_cancellationToken.IsCancellationRequested || _udp.Client == null)
+        if (_cancellationToken.IsCancellationRequested || _udp.Client == null)
             return;
         var remote = new IPEndPoint(IPAddress.Any, 0);
         var bytes = _udp.EndReceive(ar, ref remote);
@@ -127,9 +127,7 @@ public class Probe : IDisposable
         catch (Exception e)
         {
             Console.WriteLine(e);
-            
         }
-        
     }
 
     private void BroadcastProbe()

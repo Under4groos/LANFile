@@ -15,6 +15,37 @@ public class SvgButton : Button
     public static readonly StyledProperty<bool> IconVisibleProperty =
         AvaloniaProperty.Register<SvgButton, bool>(nameof(IconVisible), true);
 
+
+    public static readonly StyledProperty<double> WidthSvgProperty =
+        AvaloniaProperty.Register<SvgButton, double>(nameof(WidthSvg), 25);
+
+    public static readonly StyledProperty<double> HeightSvgProperty =
+        AvaloniaProperty.Register<SvgButton, double>(nameof(HeightSvg), 25);
+
+    public static readonly StyledProperty<Thickness> BorderMarginProperty =
+        AvaloniaProperty.Register<SvgButton, Thickness>(nameof(BorderMargin), new Thickness(5));
+
+    public Thickness BorderMargin
+    {
+        get => GetValue(BorderMarginProperty);
+        set => SetValue(BorderMarginProperty, value);
+    }
+    
+    
+    
+    public double WidthSvg
+    {
+        get => GetValue(WidthSvgProperty);
+        set => SetValue(WidthSvgProperty, value);
+    }
+
+    public double HeightSvg
+    {
+        get => GetValue(HeightSvgProperty);
+        set => SetValue(HeightSvgProperty, value);
+    }
+
+
     public string Source
     {
         get => GetValue(SourceProperty);

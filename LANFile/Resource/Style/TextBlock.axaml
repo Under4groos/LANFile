@@ -10,5 +10,5 @@
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontSize" Value="14" />
     </Style>
-    
+
 </Styles>

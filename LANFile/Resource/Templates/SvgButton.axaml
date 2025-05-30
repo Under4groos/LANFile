@@ -1,45 +1,92 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:LANFile.Views.Controls">
-    <ControlTheme x:Key="SvgButton" TargetType="controls:SvgButton">
-        <Setter Property="Background" Value="{StaticResource Button.Base}" />
-        <Setter Property="Foreground" Value="#ffffff" />
-        <Setter Property="CornerRadius" Value="8" />
+    <ControlTheme x:Key="{x:Type controls:SvgButton}" TargetType="controls:SvgButton">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThemeThickness}" />
+        <Setter Property="BorderMargin" Value="5" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="10,5,10,5" />
         <Setter Property="Margin" Value="2" />
-        <Setter Property="MinHeight" Value="30" />
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+
+
         <Setter Property="Template">
             <ControlTemplate>
-                <Border CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch">
-
-
-                    <StackPanel Margin="4,4,4,4" Orientation="Horizontal">
-                        <Panel>
+                <Border x:Name="PART_BorderPresenter"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        >
+                    <Grid>
+                        <StackPanel Margin="{TemplateBinding BorderMargin}">
                             <Svg x:Name="_svg"
-                                 HorizontalAlignment="Center"
-                                 Height="{TemplateBinding MinHeight}"
+                             
+                                 Width="{TemplateBinding WidthSvg}"
+                                 Height="{TemplateBinding HeightSvg}"
                                  Path="{TemplateBinding Source}"
                                  IsVisible="{TemplateBinding IconVisible}" />
-                        </Panel>
 
-                        <ContentPresenter x:Name="PART_ContentPresenter"
-                                          Content="{TemplateBinding Content}"
-                                          VerticalContentAlignment="Center" VerticalAlignment="Stretch"
-                                          Margin="{TemplateBinding Padding}" />
-                    </StackPanel>
+                            <ContentPresenter x:Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              VerticalContentAlignment="Center" VerticalAlignment="Stretch"
+                                              Margin="{TemplateBinding Padding}" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>
 
-        <Style Selector="^:pointerover">
-            <Setter Property="Background" Value="{StaticResource Button.Pressed}" />
-            <Setter Property="Foreground" Value="White" />
+
+        <Style Selector="^:pointerover /template/ Border#PART_BorderPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
+
         </Style>
+
         <Style Selector="^:pressed">
-            <Setter Property="Background" Value="Orange" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="RenderTransform" Value="scale(0.98)" />
+        </Style>
+
+        <Style Selector="^:pressed  /template/ Border#PART_BorderPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
+
+        </Style>
+
+        <Style Selector="^:disabled /template/ Border#PART_BorderPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundDisabled}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
+
+        </Style>
+
+        <Style Selector="^.accent">
+            <Style Selector="^ /template/ Border#PART_BorderPresenter">
+                <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThemeThickness}" />
+            </Style>
+
+            <Style Selector="^:pointerover /template/ Border#PART_BorderPresenter">
+                <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPointerOver}" />
+
+            </Style>
+
+            <Style Selector="^:pressed  /template/ Border#PART_BorderPresenter">
+                <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushPressed}" />
+
+            </Style>
+
+            <Style Selector="^:disabled /template/ Border#PART_BorderPresenter">
+                <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
+
+            </Style>
         </Style>
     </ControlTheme>
 

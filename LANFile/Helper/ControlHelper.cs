@@ -14,8 +14,9 @@ public class ControlHelper
             .OfType<T>()
             .FirstOrDefault(child => (child as Control).Name == name);
     }
-    public static IEnumerable<Control> FindTemplateControlsByType<T>(ContentControl parent,  Type type ) where T : class
+
+    public static IEnumerable<Control> FindTemplateControlsByType<T>(ContentControl parent, Type type) where T : class
     {
-        return parent.GetTemplateChildren().Where(control => control.GetType() == type );
+        return parent.GetTemplateChildren().Where(control => control.GetType() == type);
     }
 }

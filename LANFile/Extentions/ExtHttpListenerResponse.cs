@@ -17,7 +17,7 @@ public static class ExtHttpListenerResponse
     )
     {
         Console.WriteLine($"Send: {Data}");
-        byte[] data = Encoding.UTF8.GetBytes(Data);
+        var data = Encoding.UTF8.GetBytes(Data);
         httpListenerResponse.ContentType = ContentType;
         httpListenerResponse.ContentEncoding = Encoding.UTF8;
         httpListenerResponse.ContentLength64 = data.LongLength;
@@ -51,7 +51,7 @@ public static class ExtHttpListenerResponse
         string ContentType = ContentTypes.Json
     )
     {
-        string[] list = Data.Select(a => $"[{a.Key}]:{a.Value}").ToArray();
+        var list = Data.Select(a => $"[{a.Key}]:{a.Value}").ToArray();
 
         await httpListenerResponse.WriteAsyncString(string.Join("\n", list));
     }

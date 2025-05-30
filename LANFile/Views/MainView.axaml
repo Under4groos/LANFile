@@ -4,145 +4,74 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:LANFile.ViewModels"
              xmlns:controls="clr-namespace:LANFile.Views.Controls"
-             xmlns:avRichTextBox="clr-namespace:AvRichTextBox;assembly=AvRichTextBox"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LANFile.Views.MainView"
-             Background="#1e1e1e"
+             Background="{DynamicResource Window.Base}"
+
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
         <vm:MainViewModel />
     </Design.DataContext>
-    <Grid ColumnDefinitions="Auto,*">
-        <Border Grid.Column="0">
-            <Grid>
-                <Border Classes="VerticalM1 BorderM1">
-                    <Grid>
-                        <ScrollViewer>
-                            <StackPanel Name="StackPanelTabs">
-                                <Button
-                                    Tag="SelectFiles"
-                                    Classes="SegoeFluent Min40"
-                                    Content="&#xe700;" />
-                                <Button
-                                    Tag="BorderDebiveList"
-                                    Classes="SegoeFluent Min40"
-                                    Content="&#xe753;" />
-                                <Button
-                                    Tag="console"
-                                    Classes="SegoeFluent Min40"
-                                    Content="&#xe756;" />
-                            </StackPanel>
-                        </ScrollViewer>
-                        <ScrollViewer VerticalAlignment="Bottom">
-                            <StackPanel>
-                                <Button
-                                    Classes="SegoeFluent Min40"
-                                    Content="&#xe713;" />
-
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
-            </Grid>
-        </Border>
-        <Grid Grid.Column="1" Margin="0,5,5,5">
-            <Grid RowDefinitions="*,Auto">
-                <Border Grid.Row="0" Classes="BorderM1" Margin="0,0,0,4">
-                    <Grid Name="Tabs">
-                        <Grid IsVisible="False" Tag="BorderDebiveList" RowDefinitions="Auto,*">
-                            <Grid Grid.Row="0">
-                                <Border Margin="4" Classes="BorderM1">
-                                    <WrapPanel Margin="8" Orientation="Horizontal">
-                                        <TextBlock Classes="F14L"
-                                                   Text="Name:" Padding="0">
-                                        </TextBlock>
-                                        <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
-                                                   Text="{Binding Title }">
-                                        </TextBlock>
-                                        <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
-                                                   Text="{Binding Host }">
-                                        </TextBlock>
-                                    </WrapPanel>
-                                </Border>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <ScrollViewer VerticalScrollBarVisibility="Hidden">
-
-                                    <ItemsControl ItemsSource="{Binding  Devices}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel>
-                                                    <VirtualizingStackPanel Orientation="Vertical" />
-
-                                                </StackPanel>
-
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-
-                                                <controls:LanDevice Theme="{StaticResource LanDevice}"
-                                                                    ConnectName="{Binding Name}"
-                                                                    Os="{Binding Os}"
-                                                                    Port="{Binding Port}"
-                                                                    Host="{Binding Host}" />
-
-
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-
-                                </ScrollViewer>
-
-
-                            </Grid>
-
-
-                        </Grid>
-                        <Grid Tag="SelectFiles">
-                            <controls:SelectFiles Theme="{StaticResource SelectFiles}" />
-                        </Grid>
-                        <Grid IsVisible="False" Tag="console">
-                            <ScrollViewer>
-                                <StackPanel x:Name="logconsole" Orientation="Vertical">
-
-                                </StackPanel>
-                            </ScrollViewer>
-                        </Grid>
-                    </Grid>
-                </Border>
-                <Border Grid.Row="1" Classes="BorderM1">
-                    <Grid>
-                        <WrapPanel VerticalAlignment="Top">
-                            <Button
-                                Click="ButtonClickRefresh"
-                                MinHeight="30" MinWidth="30"
-                                Classes="SegoeFluent"
-                                Content="&#xe72c;" />
-                            <Button
-                                Click="ButtonClickDispose"
-                                Classes="Base"
-                                Content="DisposeAll" />
-                            <Button
-                                Click="ButtonClickBeacon"
-                                Classes="Base"
-                                Content="Start Beacon" />
-                            <Button
-                                Click="ButtonClickFindDevice"
-                                Classes="Base"
-                                Content="Find device" />
-
-
-                            <Button
-                                Click="ButtonClickRandom"
-                                Classes="Base"
-                                Content="Random" />
-                        </WrapPanel>
-                    </Grid>
-                </Border>
-            </Grid>
+    <Grid RowDefinitions="Auto,*" Margin="4">
+        <Grid Grid.Row="0">
+            <Border Classes="BorderM1" Margin="0,2,0,2">
+                <WrapPanel Margin="8" Orientation="Horizontal">
+                    <TextBlock Classes="F14L"
+                               Text="Name:" Padding="0" />
+                    <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
+                               Text="{Binding Title }" />
+                    <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
+                               Text="{Binding Host }" />
+                </WrapPanel>
+            </Border>
         </Grid>
 
-    </Grid>
+        <TabControl Margin="0" Padding="0" SelectionChanged="SelectingItemsControl_OnSelectionChanged" Grid.Row="1">
 
+
+            <controls:IconTabItem Header="Upload"
+
+                                  Classes="Buttom"
+                                  Source="/Assets/Svg/upload.svg">
+                <ScrollViewer>
+
+                    <ItemsControl ItemsSource="{Binding  Devices}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel>
+                                    <VirtualizingStackPanel Orientation="Vertical" />
+
+                                </StackPanel>
+
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                
+                                    <controls:LanDevice Theme="{StaticResource LanDevice}"
+                                                        ConnectName="{Binding Name}"
+
+                                                        Os="{Binding Os}"
+                                                        Port="{Binding Port}"
+                                                        Host="{Binding Host}" />
+
+                                 
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </controls:IconTabItem>
+            <controls:IconTabItem Header="Download"
+                                  Classes="Buttom"
+                                  Source="/Assets/Svg/download.svg">
+                <Label>1</Label>
+            </controls:IconTabItem>
+            <controls:IconTabItem Header="Log"
+                                  Classes="Buttom"
+                                  Source="/Assets/Svg/debug.svg">
+                <Label>2</Label>
+            </controls:IconTabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

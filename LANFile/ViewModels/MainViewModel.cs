@@ -12,27 +12,26 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string? _Title;
     [ObservableProperty] private string? _Host;
     [ObservableProperty] private ObservableCollection<DeviceModel> _devices = [];
-
+    
+    private Random R = new Random();
 
     public MainViewModel()
     {
-        this.Title = "LANFile-Debug";
-        
+        Title = "LANFile-Debug";
     }
+
     public void Random()
     {
         ObservableCollection<DeviceModel> devices = [];
         for (var i = 0; i < 15; i++)
-        {
-            devices.Add(new DeviceModel()
+            devices.Add(new DeviceModel
             {
-                Host = $"{App.R.Next(0, 255)}.{App.R.Next(0, 255)}.{App.R.Next(0, 255)}.{App.R.Next(0, 255)}",
+                Host = $"{R.Next(0, 255)}.{R.Next(0, 255)}.{R.Next(0, 255)}.{R.Next(0, 255)}",
                 Name = $"{Guid.NewGuid()}".Substring(10),
                 Os = $"{(i / 2 == 1 ? "android" : "windows")}",
-                Port = $"{App.R.Next(0, 255)}{App.R.Next(0, 255)}{App.R.Next(0, 255)}{App.R.Next(0, 255)}",
-                Ping = App.R.Next(10, 1000)
+                Port = $"{R.Next(0, 255)}{R.Next(0, 255)}{R.Next(0, 255)}{R.Next(0, 255)}",
+                Ping = R.Next(10, 1000)
             });
-        }
-        this.Devices = devices;
+        Devices = devices;
     }
 }

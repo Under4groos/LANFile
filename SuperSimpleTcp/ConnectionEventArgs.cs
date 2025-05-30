@@ -1,26 +1,25 @@
-﻿namespace SuperSimpleTcp
+﻿namespace SuperSimpleTcp;
+
+using System;
+
+/// <summary>
+/// Arguments for connection events.
+/// </summary>
+public class ConnectionEventArgs : EventArgs
 {
-    using System;
+    internal ConnectionEventArgs(string ipPort, DisconnectReason reason = DisconnectReason.None)
+    {
+        IpPort = ipPort;
+        Reason = reason;
+    }
 
     /// <summary>
-    /// Arguments for connection events.
+    /// The IP address and port number of the connected peer socket.
     /// </summary>
-    public class ConnectionEventArgs : EventArgs
-    {
-        internal ConnectionEventArgs(string ipPort, DisconnectReason reason = DisconnectReason.None)
-        {
-            IpPort = ipPort;
-            Reason = reason;
-        }
+    public string IpPort { get; }
 
-        /// <summary>
-        /// The IP address and port number of the connected peer socket.
-        /// </summary>
-        public string IpPort { get; }
-
-        /// <summary>
-        /// The reason for the disconnection, if any.
-        /// </summary>
-        public DisconnectReason Reason { get; } = DisconnectReason.None;
-    }
+    /// <summary>
+    /// The reason for the disconnection, if any.
+    /// </summary>
+    public DisconnectReason Reason { get; } = DisconnectReason.None;
 }

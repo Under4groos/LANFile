@@ -13,9 +13,12 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Resource/Colors.axaml" />
-                <ResourceInclude Source="/Resource/Templates/Button.axaml" />
+               
                 <ResourceInclude Source="/Resource/Templates/LanDevice.axaml" />
                 <ResourceInclude Source="/Resource/Templates/SelectFiles.axaml" />
+                <ResourceInclude Source="/Resource/Templates/Button.axaml" />
+                <ResourceInclude Source="/Resource/Templates/SvgButton.axaml" />
+                <ResourceInclude Source="/Resource/Templates/IconTabItem.axaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:SvgFormatConverter x:Key="SvgFormatConverter" />
         </ResourceDictionary>
@@ -25,6 +28,7 @@
         <FluentTheme DensityStyle="Compact" />
         <StyleInclude Source="/Resource/Style/Border.axaml" />
         <StyleInclude Source="/Resource/Style/TextBlock.axaml" />
-        <StyleInclude Source="Resource/Style/Button.axaml" />
+        <StyleInclude Source="/Resource/Style/TabControl.axaml" />
+        <StyleInclude Source="/Resource/Style/IconTabItem.axaml" />
     </Application.Styles>
 </Application>

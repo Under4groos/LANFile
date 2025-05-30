@@ -1,26 +1,25 @@
-﻿namespace SuperSimpleTcp
+﻿namespace SuperSimpleTcp;
+
+using System;
+
+/// <summary>
+/// Arguments for data received from connected endpoints.
+/// </summary>
+public class DataReceivedEventArgs : EventArgs
 {
-    using System;
+    internal DataReceivedEventArgs(string ipPort, ArraySegment<byte> data)
+    {
+        IpPort = ipPort;
+        Data = data;
+    }
 
     /// <summary>
-    /// Arguments for data received from connected endpoints.
+    /// The IP address and port number of the connected endpoint.
     /// </summary>
-    public class DataReceivedEventArgs : EventArgs
-    {
-        internal DataReceivedEventArgs(string ipPort, ArraySegment<byte> data)
-        {
-            IpPort = ipPort;
-            Data = data;
-        }
+    public string IpPort { get; }
 
-        /// <summary>
-        /// The IP address and port number of the connected endpoint.
-        /// </summary>
-        public string IpPort { get; }
-
-        /// <summary>
-        /// The data received from the endpoint.
-        /// </summary>
-        public ArraySegment<byte> Data { get; }
-    }
+    /// <summary>
+    /// The data received from the endpoint.
+    /// </summary>
+    public ArraySegment<byte> Data { get; }
 }

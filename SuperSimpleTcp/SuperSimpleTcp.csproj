@@ -12,14 +12,13 @@
         <PackageProjectUrl>https://github.com/jchristn/supersimpletcp</PackageProjectUrl>
         <RepositoryUrl>https://github.com/jchristn/supersimpletcp</RepositoryUrl>
         <RepositoryType>Github</RepositoryType>
-       
+
         <PackageId>SuperSimpleTcp</PackageId>
         <Product>SuperSimpleTcp</Product>
-        
-      
+
 
         <Title>SuperSimpleTcp</Title>
-		 
+
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
     </PropertyGroup>
 

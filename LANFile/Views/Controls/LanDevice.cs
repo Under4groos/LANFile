@@ -78,18 +78,16 @@ public class LanDevice : ContentControl
     private WrapPanel? _wrapPanel;
     private Thread? _thread;
     private SimpleTcpClient? _simpleTcpClient;
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
 
 
         _wrapPanel = ControlHelper.FindTemplateControlByName<WrapPanel>(this, "WrapPanel");
-        Button[] buttons = ControlHelper.FindTemplateControlsByType<WrapPanel>(this, typeof(Button))
+        var buttons = ControlHelper.FindTemplateControlsByType<WrapPanel>(this, typeof(Button))
             .Select(a => (Button)a).ToArray();
-        foreach (Button button in buttons)
-        {
-            button.Click += ButtonOnClick;
-        }
+        foreach (var button in buttons) button.Click += ButtonOnClick;
     }
 
     protected override void OnUnloaded(RoutedEventArgs e)
@@ -109,7 +107,7 @@ public class LanDevice : ContentControl
         switch (button.Tag)
         {
             case "send":
-    
+
                 break;
             case "tcp":
             {
@@ -127,45 +125,39 @@ public class LanDevice : ContentControl
                             _simpleTcpClient = null;
                         }
                     }
-                    if(_simpleTcpClient == null)
+
+                    if (_simpleTcpClient == null)
                     {
                         _simpleTcpClient = new SimpleTcpClient($"{Host}:9000");
 
                         _simpleTcpClient.Connect();
-                    
-                        
                     }
-                      
-                  
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
-                   
                 }
             }
-                
-                
+
+
                 break;
             case "ping":
-                this.Ping = "...";
+                Ping = "...";
                 var host = Host;
 
                 button.IsEnabled = false;
 
                 _thread = new Thread(async () =>
                 {
-                    
-
                     try
                     {
-                        Ping p1 = new Ping();
+                        var p1 = new Ping();
                         PingReply PR;
 
                         do
                         {
                             PR = p1.Send(host);
-                            string pingStatus = PR.Status == IPStatus.Success
+                            var pingStatus = PR.Status == IPStatus.Success
                                 ? $"{PR.RoundtripTime} ms"
                                 : PR.Status.ToString();
 
@@ -173,7 +165,7 @@ public class LanDevice : ContentControl
                             Dispatcher.UIThread.Invoke(() =>
                                 {
                                     button.IsEnabled = true;
-                                    this.Ping = pingStatus;
+                                    Ping = pingStatus;
                                 },
                                 DispatcherPriority.Background);
                         } while (PR.Status != IPStatus.Success);
