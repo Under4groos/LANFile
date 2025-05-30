@@ -12,17 +12,17 @@ public class HttpService
 
     public HttpService()
     {
-        HttpClientHandler handler = new HttpClientHandler 
-        { 
-            AutomaticDecompression = DecompressionMethods.All 
+        var handler = new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.All
         };
-        
+
         _client = new HttpClient(handler);
     }
 
     public async Task<string> GetAsync(string uri)
     {
-        using HttpResponseMessage response = await _client.GetAsync(uri);
+        using var response = await _client.GetAsync(uri);
 
         return await response.Content.ReadAsStringAsync();
     }
@@ -30,15 +30,15 @@ public class HttpService
     public async Task<string> PostAsync(string uri, string data, string contentType)
     {
         using HttpContent content = new StringContent(data, Encoding.UTF8, contentType);
-        
-        HttpRequestMessage requestMessage = new HttpRequestMessage() 
-        { 
+
+        var requestMessage = new HttpRequestMessage
+        {
             Content = content,
             Method = HttpMethod.Post,
             RequestUri = new Uri(uri)
         };
-        
-        using HttpResponseMessage response = await _client.SendAsync(requestMessage);
+
+        using var response = await _client.SendAsync(requestMessage);
 
         return await response.Content.ReadAsStringAsync();
     }
