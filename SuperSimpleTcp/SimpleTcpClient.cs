@@ -1,6 +1,4 @@
-﻿namespace SuperSimpleTcp;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,39 +12,37 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace SuperSimpleTcp;
+
 /// <summary>
-/// SimpleTcp client with SSL support.  
-/// Set the Connected, Disconnected, and DataReceived events.  
-/// Once set, use Connect() to connect to the server.
+///     SimpleTcp client with SSL support.
+///     Set the Connected, Disconnected, and DataReceived events.
+///     Once set, use Connect() to connect to the server.
 /// </summary>
 public class SimpleTcpClient : IDisposable
 {
     #region Public-Members
 
     /// <summary>
-    /// Indicates whether or not the client is connected to the server.
+    ///     Indicates whether or not the client is connected to the server.
     /// </summary>
-    public bool IsConnected
-    {
-        get => _isConnected;
-        private set => _isConnected = value;
-    }
+    public bool IsConnected { get; private set; }
 
     /// <summary>
-    /// Client IPEndPoint if connected.
+    ///     Client IPEndPoint if connected.
     /// </summary>
     public IPEndPoint LocalEndpoint
     {
         get
         {
-            if (_client != null && _isConnected) return (IPEndPoint)_client.Client.LocalEndPoint;
+            if (_client != null && IsConnected) return (IPEndPoint)_client.Client.LocalEndPoint;
 
             return null;
         }
     }
 
     /// <summary>
-    /// SimpleTcp client settings.
+    ///     SimpleTcp client settings.
     /// </summary>
     public SimpleTcpClientSettings Settings
     {
@@ -59,7 +55,7 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// SimpleTcp client events.
+    ///     SimpleTcp client events.
     /// </summary>
     public SimpleTcpClientEvents Events
     {
@@ -72,12 +68,12 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// SimpleTcp statistics.
+    ///     SimpleTcp statistics.
     /// </summary>
-    public SimpleTcpStatistics Statistics => _statistics;
+    public SimpleTcpStatistics Statistics { get; } = new();
 
     /// <summary>
-    /// SimpleTcp keepalive settings.
+    ///     SimpleTcp keepalive settings.
     /// </summary>
     public SimpleTcpKeepaliveSettings Keepalive
     {
@@ -90,12 +86,12 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Method to invoke to send a log message.
+    ///     Method to invoke to send a log message.
     /// </summary>
     public Action<string> Logger = null;
 
     /// <summary>
-    /// The IP:port of the server to which this client is mapped.
+    ///     The IP:port of the server to which this client is mapped.
     /// </summary>
     public string ServerIpPort => $"{_serverIp}:{_serverPort}";
 
@@ -107,42 +103,40 @@ public class SimpleTcpClient : IDisposable
     private SimpleTcpClientSettings _settings = new();
     private SimpleTcpClientEvents _events = new();
     private SimpleTcpKeepaliveSettings _keepalive = new();
-    private SimpleTcpStatistics _statistics = new();
 
-    private string _serverIp = null;
-    private int _serverPort = 0;
-    private readonly IPAddress _ipAddress = null;
-    private TcpClient _client = null;
-    private NetworkStream _networkStream = null;
+    private readonly string _serverIp;
+    private readonly int _serverPort;
+    private readonly IPAddress _ipAddress;
+    private TcpClient _client;
+    private NetworkStream _networkStream;
 
-    private bool _ssl = false;
-    private string _pfxCertFilename = null;
-    private string _pfxPassword = null;
-    private SslStream _sslStream = null;
-    private X509Certificate2 _sslCert = null;
-    private X509Certificate2Collection _sslCertCollection = null;
+    private bool _ssl;
+    private string _pfxCertFilename;
+    private string _pfxPassword;
+    private SslStream _sslStream;
+    private X509Certificate2 _sslCert;
+    private X509Certificate2Collection _sslCertCollection;
 
     private readonly SemaphoreSlim _sendLock = new(1, 1);
-    private bool _isConnected = false;
 
-    private Task _dataReceiver = null;
-    private Task _idleServerMonitor = null;
-    private Task _connectionMonitor = null;
+    private Task _dataReceiver;
+    private Task _idleServerMonitor;
+    private Task _connectionMonitor;
     private CancellationTokenSource _tokenSource = new();
     private CancellationToken _token;
 
     private DateTime _lastActivity = DateTime.Now;
-    private bool _isTimeout = false;
+    private bool _isTimeout;
 
     #endregion
 
     #region Constructors-and-Factories
 
     /// <summary>
-    /// Instantiates the TCP client without SSL. 
-    /// Set the Connected, Disconnected, and DataReceived callbacks. Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client without SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks. Once set, use Connect() to connect to the server.
     /// </summary>
-    /// <param name="ipPort">The IP:port of the server.</param> 
+    /// <param name="ipPort">The IP:port of the server.</param>
     public SimpleTcpClient(string ipPort)
     {
         if (string.IsNullOrEmpty(ipPort)) throw new ArgumentNullException(nameof(ipPort));
@@ -159,10 +153,10 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client. 
-    /// Set the Connected, Disconnected, and DataReceived callbacks. Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks. Once set, use Connect() to connect to the server.
     /// </summary>
-    /// <param name="ipPort">The IP:port of the server.</param> 
+    /// <param name="ipPort">The IP:port of the server.</param>
     /// <param name="ssl">Enable or disable SSL.</param>
     /// <param name="pfxCertFilename">The filename of the PFX certificate file.</param>
     /// <param name="pfxPassword">The password to the PFX certificate file.</param>
@@ -178,8 +172,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client without SSL. 
-    /// Set the Connected, Disconnected, and DataReceived callbacks. Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client without SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks. Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpOrHostname">The server IP address or hostname.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -199,8 +193,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpOrHostname">The server IP address or hostname.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -220,8 +214,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client with SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client with SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpOrHostname">The server IP address or hostname.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -237,8 +231,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client with SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client with SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpOrHostname">The server IP address or hostname.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -254,8 +248,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client without SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client without SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpAddress">The server IP address.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -264,8 +258,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpAddress">The server IP address.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -285,8 +279,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client with SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client with SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpAddress">The server IP address.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -302,8 +296,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client with SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client with SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpAddress">The server IP address.</param>
     /// <param name="port">The TCP port on which to connect.</param>
@@ -320,31 +314,24 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client without SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client without SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpEndPoint">The server IP endpoint.</param>
     public SimpleTcpClient(IPEndPoint serverIpEndPoint)
     {
-        if (serverIpEndPoint == null)
-        {
-            throw new ArgumentNullException(nameof(serverIpEndPoint));
-        }
-        else if (serverIpEndPoint.Port < 0)
-        {
-            throw new ArgumentException("Port must be zero or greater.");
-        }
-        else
-        {
-            _ipAddress = serverIpEndPoint.Address;
-            _serverIp = serverIpEndPoint.Address.ToString();
-            _serverPort = serverIpEndPoint.Port;
-        }
+        if (serverIpEndPoint == null) throw new ArgumentNullException(nameof(serverIpEndPoint));
+
+        if (serverIpEndPoint.Port < 0) throw new ArgumentException("Port must be zero or greater.");
+
+        _ipAddress = serverIpEndPoint.Address;
+        _serverIp = serverIpEndPoint.Address.ToString();
+        _serverPort = serverIpEndPoint.Port;
     }
 
     /// <summary>
-    /// Instantiates the TCP client.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpEndPoint">The server IP endpoint.</param>
     /// <param name="ssl">Enable or disable SSL.</param>
@@ -359,8 +346,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client with SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client with SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpEndPoint">The server IP endpoint.</param>
     /// <param name="certificate">Certificate.</param>
@@ -372,8 +359,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP client with SSL.  
-    /// Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
+    ///     Instantiates the TCP client with SSL.
+    ///     Set the Connected, Disconnected, and DataReceived callbacks.  Once set, use Connect() to connect to the server.
     /// </summary>
     /// <param name="serverIpEndPoint">The server IP endpoint.</param>
     /// <param name="certificate">Byte array containing the certificate.</param>
@@ -389,7 +376,7 @@ public class SimpleTcpClient : IDisposable
     #region Public-Methods
 
     /// <summary>
-    /// Dispose of the TCP client.
+    ///     Dispose of the TCP client.
     /// </summary>
     public void Dispose()
     {
@@ -398,7 +385,7 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Establish a connection to the server.
+    ///     Establish a connection to the server.
     /// </summary>
     public void Connect()
     {
@@ -407,12 +394,10 @@ public class SimpleTcpClient : IDisposable
             Logger?.Invoke($"{_header}already connected");
             return;
         }
-        else
-        {
-            Logger?.Invoke($"{_header}initializing client");
-            InitializeClient(_ssl, _pfxCertFilename, _pfxPassword, _sslCert);
-            Logger?.Invoke($"{_header}connecting to {ServerIpPort}");
-        }
+
+        Logger?.Invoke($"{_header}initializing client");
+        InitializeClient(_ssl, _pfxCertFilename, _pfxPassword, _sslCert);
+        Logger?.Invoke($"{_header}connecting to {ServerIpPort}");
 
         _tokenSource = new CancellationTokenSource();
         _token = _tokenSource.Token;
@@ -440,47 +425,40 @@ public class SimpleTcpClient : IDisposable
         var ar = _client.BeginConnect(_serverIp, _serverPort, null, null);
         var wh = ar.AsyncWaitHandle;
 
-        try
+        if (!ar.AsyncWaitHandle.WaitOne(TimeSpan.FromMilliseconds(_settings.ConnectTimeoutMs), false))
         {
-            if (!ar.AsyncWaitHandle.WaitOne(TimeSpan.FromMilliseconds(_settings.ConnectTimeoutMs), false))
-            {
-                _client.Close();
-                throw new TimeoutException($"Timeout connecting to {ServerIpPort}");
-            }
-
-            _client.EndConnect(ar);
-            _networkStream = _client.GetStream();
-            _networkStream.ReadTimeout = _settings.ReadTimeoutMs;
-
-            if (_ssl)
-            {
-                if (_settings.AcceptInvalidCertificates)
-                    _sslStream = new SslStream(_networkStream, false,
-                        new RemoteCertificateValidationCallback(AcceptCertificate));
-                else if (_settings.CertificateValidationCallback != null)
-                    _sslStream = new SslStream(_networkStream, false,
-                        new RemoteCertificateValidationCallback(_settings.CertificateValidationCallback));
-                else
-                    _sslStream = new SslStream(_networkStream, false);
-
-                _sslStream.ReadTimeout = _settings.ReadTimeoutMs;
-                _sslStream.AuthenticateAsClient(_serverIp, _sslCertCollection, SslProtocols.Tls12,
-                    _settings.CheckCertificateRevocation);
-
-                if (!_sslStream.IsEncrypted) throw new AuthenticationException("Stream is not encrypted");
-                if (!_sslStream.IsAuthenticated) throw new AuthenticationException("Stream is not authenticated");
-                if (_settings.MutuallyAuthenticate && !_sslStream.IsMutuallyAuthenticated)
-                    throw new AuthenticationException("Mutual authentication failed");
-            }
-
-            if (_keepalive.EnableTcpKeepAlives) EnableKeepalives();
-        }
-        catch (Exception)
-        {
-            throw;
+            _client.Close();
+            throw new TimeoutException($"Timeout connecting to {ServerIpPort}");
         }
 
-        _isConnected = true;
+        _client.EndConnect(ar);
+        _networkStream = _client.GetStream();
+        _networkStream.ReadTimeout = _settings.ReadTimeoutMs;
+
+        if (_ssl)
+        {
+            if (_settings.AcceptInvalidCertificates)
+                _sslStream = new SslStream(_networkStream, false,
+                    AcceptCertificate);
+            else if (_settings.CertificateValidationCallback != null)
+                _sslStream = new SslStream(_networkStream, false,
+                    _settings.CertificateValidationCallback);
+            else
+                _sslStream = new SslStream(_networkStream, false);
+
+            _sslStream.ReadTimeout = _settings.ReadTimeoutMs;
+            _sslStream.AuthenticateAsClient(_serverIp, _sslCertCollection, SslProtocols.Tls12,
+                _settings.CheckCertificateRevocation);
+
+            if (!_sslStream.IsEncrypted) throw new AuthenticationException("Stream is not encrypted");
+            if (!_sslStream.IsAuthenticated) throw new AuthenticationException("Stream is not authenticated");
+            if (_settings.MutuallyAuthenticate && !_sslStream.IsMutuallyAuthenticated)
+                throw new AuthenticationException("Mutual authentication failed");
+        }
+
+        if (_keepalive.EnableTcpKeepAlives) EnableKeepalives();
+
+        IsConnected = true;
         _lastActivity = DateTime.Now;
         _isTimeout = false;
         _events.HandleConnected(this, new ConnectionEventArgs(ServerIpPort));
@@ -490,7 +468,8 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Establish the connection to the server with retries up to either the timeout specified or the value in Settings.ConnectTimeoutMs.
+    ///     Establish the connection to the server with retries up to either the timeout specified or the value in
+    ///     Settings.ConnectTimeoutMs.
     /// </summary>
     /// <param name="timeoutMs">The amount of time in milliseconds to continue attempting connections.</param>
     public void ConnectWithRetries(int? timeoutMs = null)
@@ -504,14 +483,12 @@ public class SimpleTcpClient : IDisposable
             Logger?.Invoke($"{_header}already connected");
             return;
         }
-        else
-        {
-            Logger?.Invoke($"{_header}initializing client");
 
-            InitializeClient(_ssl, _pfxCertFilename, _pfxPassword, _sslCert);
+        Logger?.Invoke($"{_header}initializing client");
 
-            Logger?.Invoke($"{_header}connecting to {ServerIpPort}");
-        }
+        InitializeClient(_ssl, _pfxCertFilename, _pfxPassword, _sslCert);
+
+        Logger?.Invoke($"{_header}connecting to {ServerIpPort}");
 
         _tokenSource = new CancellationTokenSource();
         _token = _tokenSource.Token;
@@ -586,41 +563,34 @@ public class SimpleTcpClient : IDisposable
                 throw new TimeoutException($"Timeout connecting to {ServerIpPort}");
             }
 
-            try
+            _networkStream = _client.GetStream();
+            _networkStream.ReadTimeout = _settings.ReadTimeoutMs;
+
+            if (_ssl)
             {
-                _networkStream = _client.GetStream();
-                _networkStream.ReadTimeout = _settings.ReadTimeoutMs;
+                if (_settings.AcceptInvalidCertificates)
+                    _sslStream = new SslStream(_networkStream, false,
+                        AcceptCertificate);
+                else if (_settings.CertificateValidationCallback != null)
+                    _sslStream = new SslStream(_networkStream, false,
+                        _settings.CertificateValidationCallback);
+                else
+                    _sslStream = new SslStream(_networkStream, false);
 
-                if (_ssl)
-                {
-                    if (_settings.AcceptInvalidCertificates)
-                        _sslStream = new SslStream(_networkStream, false,
-                            new RemoteCertificateValidationCallback(AcceptCertificate));
-                    else if (_settings.CertificateValidationCallback != null)
-                        _sslStream = new SslStream(_networkStream, false,
-                            new RemoteCertificateValidationCallback(_settings.CertificateValidationCallback));
-                    else
-                        _sslStream = new SslStream(_networkStream, false);
+                _sslStream.ReadTimeout = _settings.ReadTimeoutMs;
+                _sslStream.AuthenticateAsClient(_serverIp, _sslCertCollection, SslProtocols.Tls12,
+                    _settings.CheckCertificateRevocation);
 
-                    _sslStream.ReadTimeout = _settings.ReadTimeoutMs;
-                    _sslStream.AuthenticateAsClient(_serverIp, _sslCertCollection, SslProtocols.Tls12,
-                        _settings.CheckCertificateRevocation);
-
-                    if (!_sslStream.IsEncrypted) throw new AuthenticationException("Stream is not encrypted");
-                    if (!_sslStream.IsAuthenticated) throw new AuthenticationException("Stream is not authenticated");
-                    if (_settings.MutuallyAuthenticate && !_sslStream.IsMutuallyAuthenticated)
-                        throw new AuthenticationException("Mutual authentication failed");
-                }
-
-                if (_keepalive.EnableTcpKeepAlives) EnableKeepalives();
+                if (!_sslStream.IsEncrypted) throw new AuthenticationException("Stream is not encrypted");
+                if (!_sslStream.IsAuthenticated) throw new AuthenticationException("Stream is not authenticated");
+                if (_settings.MutuallyAuthenticate && !_sslStream.IsMutuallyAuthenticated)
+                    throw new AuthenticationException("Mutual authentication failed");
             }
-            catch (Exception)
-            {
-                throw;
-            }
+
+            if (_keepalive.EnableTcpKeepAlives) EnableKeepalives();
         }
 
-        _isConnected = true;
+        IsConnected = true;
         _lastActivity = DateTime.Now;
         _isTimeout = false;
         _events.HandleConnected(this, new ConnectionEventArgs(ServerIpPort));
@@ -630,7 +600,7 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Disconnect from the server.
+    ///     Disconnect from the server.
     /// </summary>
     public void Disconnect()
     {
@@ -645,11 +615,11 @@ public class SimpleTcpClient : IDisposable
         _tokenSource.Cancel();
         WaitCompletion();
         _client.Close();
-        _isConnected = false;
+        IsConnected = false;
     }
 
     /// <summary>
-    /// Disconnect from the server.
+    ///     Disconnect from the server.
     /// </summary>
     public async Task DisconnectAsync()
     {
@@ -664,30 +634,30 @@ public class SimpleTcpClient : IDisposable
         _tokenSource.Cancel();
         await WaitCompletionAsync();
         _client.Close();
-        _isConnected = false;
+        IsConnected = false;
     }
 
     /// <summary>
-    /// Send data to the server.
+    ///     Send data to the server.
     /// </summary>
     /// <param name="data">String containing data to send.</param>
     public void Send(string data)
     {
         if (string.IsNullOrEmpty(data)) throw new ArgumentNullException(nameof(data));
-        if (!_isConnected) throw new IOException("Not connected to the server; use Connect() first.");
+        if (!IsConnected) throw new IOException("Not connected to the server; use Connect() first.");
 
         var bytes = Encoding.UTF8.GetBytes(data);
         Send(bytes);
     }
 
     /// <summary>
-    /// Send data to the server.
-    /// </summary> 
+    ///     Send data to the server.
+    /// </summary>
     /// <param name="data">Byte array containing data to send.</param>
     public void Send(byte[] data)
     {
         if (data == null || data.Length < 1) throw new ArgumentNullException(nameof(data));
-        if (!_isConnected) throw new IOException("Not connected to the server; use Connect() first.");
+        if (!IsConnected) throw new IOException("Not connected to the server; use Connect() first.");
 
         using (var ms = new MemoryStream())
         {
@@ -698,7 +668,7 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Send data to the server.
+    ///     Send data to the server.
     /// </summary>
     /// <param name="contentLength">The number of bytes to read from the source stream to send.</param>
     /// <param name="stream">Stream containing the data to send.</param>
@@ -707,20 +677,20 @@ public class SimpleTcpClient : IDisposable
         if (contentLength < 1) return;
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         if (!stream.CanRead) throw new InvalidOperationException("Cannot read from supplied stream.");
-        if (!_isConnected) throw new IOException("Not connected to the server; use Connect() first.");
+        if (!IsConnected) throw new IOException("Not connected to the server; use Connect() first.");
 
         SendInternal(contentLength, stream);
     }
 
     /// <summary>
-    /// Send data to the server asynchronously.
+    ///     Send data to the server asynchronously.
     /// </summary>
     /// <param name="data">String containing data to send.</param>
     /// <param name="token">Cancellation token for canceling the request.</param>
     public async Task SendAsync(string data, CancellationToken token = default)
     {
         if (string.IsNullOrEmpty(data)) throw new ArgumentNullException(nameof(data));
-        if (!_isConnected) throw new IOException("Not connected to the server; use Connect() first.");
+        if (!IsConnected) throw new IOException("Not connected to the server; use Connect() first.");
         if (token == default) token = _token;
 
         var bytes = Encoding.UTF8.GetBytes(data);
@@ -734,14 +704,14 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Send data to the server asynchronously.
-    /// </summary> 
+    ///     Send data to the server asynchronously.
+    /// </summary>
     /// <param name="data">Byte array containing data to send.</param>
     /// <param name="token">Cancellation token for canceling the request.</param>
     public async Task SendAsync(byte[] data, CancellationToken token = default)
     {
         if (data == null || data.Length < 1) throw new ArgumentNullException(nameof(data));
-        if (!_isConnected) throw new IOException("Not connected to the server; use Connect() first.");
+        if (!IsConnected) throw new IOException("Not connected to the server; use Connect() first.");
         if (token == default) token = _token;
 
         using (var ms = new MemoryStream())
@@ -753,7 +723,7 @@ public class SimpleTcpClient : IDisposable
     }
 
     /// <summary>
-    /// Send data to the server asynchronously.
+    ///     Send data to the server asynchronously.
     /// </summary>
     /// <param name="contentLength">The number of bytes to read from the source stream to send.</param>
     /// <param name="stream">Stream containing the data to send.</param>
@@ -763,7 +733,7 @@ public class SimpleTcpClient : IDisposable
         if (contentLength < 1) return;
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         if (!stream.CanRead) throw new InvalidOperationException("Cannot read from supplied stream.");
-        if (!_isConnected) throw new IOException("Not connected to the server; use Connect() first.");
+        if (!IsConnected) throw new IOException("Not connected to the server; use Connect() first.");
         if (token == default) token = _token;
 
         await SendInternalAsync(contentLength, stream, token).ConfigureAwait(false);
@@ -774,14 +744,14 @@ public class SimpleTcpClient : IDisposable
     #region Private-Methods
 
     /// <summary>
-    /// Dispose of the TCP client.
+    ///     Dispose of the TCP client.
     /// </summary>
     /// <param name="disposing">Dispose of resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)
         {
-            _isConnected = false;
+            IsConnected = false;
 
             if (_tokenSource != null)
                 if (!_tokenSource.IsCancellationRequested)
@@ -872,15 +842,13 @@ public class SimpleTcpClient : IDisposable
                         else
                             action.Invoke();
 
-                        _statistics.ReceivedBytes += data.Count;
+                        Statistics.ReceivedBytes += data.Count;
 
                         return data;
                     }
-                    else
-                    {
-                        await Task.Delay(100).ConfigureAwait(false);
-                        return default;
-                    }
+
+                    await Task.Delay(100).ConfigureAwait(false);
+                    return default;
                 }, token).ContinueWith(task => { }).ConfigureAwait(false);
             }
             catch (AggregateException)
@@ -921,7 +889,7 @@ public class SimpleTcpClient : IDisposable
 
         Logger?.Invoke($"{_header}disconnection detected");
 
-        _isConnected = false;
+        IsConnected = false;
 
         if (!_isTimeout)
             _events.HandleClientDisconnected(this, new ConnectionEventArgs(ServerIpPort, DisconnectReason.Normal));
@@ -943,32 +911,28 @@ public class SimpleTcpClient : IDisposable
                 read = await _sslStream.ReadAsync(buffer, 0, buffer.Length, token).ConfigureAwait(false);
 
             if (read > 0)
-            {
                 using (var ms = new MemoryStream())
                 {
                     ms.Write(buffer, 0, read);
                     return new ArraySegment<byte>(ms.GetBuffer(), 0, (int)ms.Length);
                 }
-            }
-            else
+
+            var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+            var tcpConnections = ipProperties.GetActiveTcpConnections()
+                .Where(x => x.LocalEndPoint.Equals(_client.Client.LocalEndPoint) &&
+                            x.RemoteEndPoint.Equals(_client.Client.RemoteEndPoint)).ToArray();
+
+            var isOk = false;
+
+            if (tcpConnections != null && tcpConnections.Length > 0)
             {
-                var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-                var tcpConnections = ipProperties.GetActiveTcpConnections()
-                    .Where(x => x.LocalEndPoint.Equals(_client.Client.LocalEndPoint) &&
-                                x.RemoteEndPoint.Equals(_client.Client.RemoteEndPoint)).ToArray();
-
-                var isOk = false;
-
-                if (tcpConnections != null && tcpConnections.Length > 0)
-                {
-                    var stateOfConnection = tcpConnections.First().State;
-                    if (stateOfConnection == TcpState.Established) isOk = true;
-                }
-
-                if (!isOk) await DisconnectAsync();
-
-                throw new SocketException();
+                var stateOfConnection = tcpConnections.First().State;
+                if (stateOfConnection == TcpState.Established) isOk = true;
             }
+
+            if (!isOk) await DisconnectAsync();
+
+            throw new SocketException();
         }
         catch (IOException)
         {
@@ -998,7 +962,7 @@ public class SimpleTcpClient : IDisposable
                     else _sslStream.Write(buffer, 0, bytesRead);
 
                     bytesRemaining -= bytesRead;
-                    _statistics.SentBytes += bytesRead;
+                    Statistics.SentBytes += bytesRead;
                 }
             }
 
@@ -1031,7 +995,7 @@ public class SimpleTcpClient : IDisposable
                     else await _sslStream.WriteAsync(buffer, 0, bytesRead, token).ConfigureAwait(false);
 
                     bytesRemaining -= bytesRead;
-                    _statistics.SentBytes += bytesRead;
+                    Statistics.SentBytes += bytesRead;
                 }
             }
 
@@ -1137,7 +1101,7 @@ public class SimpleTcpClient : IDisposable
                 if (DateTime.Now > timeoutTime)
                 {
                     Logger?.Invoke($"{_header}disconnecting from {ServerIpPort} due to timeout");
-                    _isConnected = false;
+                    IsConnected = false;
                     _isTimeout = true;
                     _tokenSource.Cancel(); // DataReceiver will fire events including dispose
                 }
@@ -1159,13 +1123,13 @@ public class SimpleTcpClient : IDisposable
             {
                 await Task.Delay(_settings.ConnectionLostEvaluationIntervalMs, _token).ConfigureAwait(false);
 
-                if (!_isConnected)
+                if (!IsConnected)
                     continue; //Just monitor connected clients
 
                 if (!PollSocket())
                 {
                     Logger?.Invoke($"{_header}disconnecting from {ServerIpPort} due to connection lost");
-                    _isConnected = false;
+                    IsConnected = false;
                     _tokenSource.Cancel(); // DataReceiver will fire events including dispose
                 }
             }

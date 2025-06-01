@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using BeaconLib;
+using Java.Net;
 using Java.Util;
 using LANFile.Models;
 
@@ -17,31 +18,35 @@ namespace LANFile.Helper;
 [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
 public class MultiConnectionService : IDisposable
 {
-    private ObservableCollection<DeviceModel> _devices = [];
-    private Beacon? _beacon = null;
-    private Probe? _probe = null;
-    public static string NameApplication { get; set; } = $"{Guid.NewGuid().ToString().Substring(0, 9)}";
+    private const string _fileDeviceInfo = "_devices.txt";
+    private readonly ObservableCollection<DeviceModel> _devices = [];
+    private Beacon? _beacon;
+    private List<BeaconLocation> _beaconLocations = [];
+    private Probe? _probe;
 
     public Action<ObservableCollection<DeviceModel>> DevicesUpdated;
     public IPAddress Host;
-    public static string Platform { get; set; } = string.Empty;
-
-
-    public string ConnectionName { get; set; } = "LANFileApplication";
 
     public MultiConnectionService()
     {
         Platform = $"{(OperatingSystem.IsAndroid() ? "Android" : "Windows")}";
 
-
         var adressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
         Host = adressList
             .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToArray().Last();
 
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Host = AndroidGetLocalIp();
-        }
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Host = AndroidGetLocalIp();
+    }
+
+    public string NameApplication { get; set; } = $"{Guid.NewGuid().ToString().Substring(0, 8)}";
+    public static string Platform { get; set; } = string.Empty;
+    public string ConnectionName { get; set; } = "LANFileConnect";
+
+    public void Dispose()
+    {
+        CloseAll();
+        GC.SuppressFinalize(this);
+        GC.Collect();
     }
 
 
@@ -59,7 +64,7 @@ public class MultiConnectionService : IDisposable
 
     public void ProbeStart()
     {
-        _probe = new Probe(ConnectionName, Host);
+        _probe = new Probe(ConnectionName, IPAddress.Any);
         _probe.BeaconsUpdated += ProbeOnBeaconsUpdated;
 
 
@@ -88,43 +93,52 @@ public class MultiConnectionService : IDisposable
 
     private void ProbeOnBeaconsUpdated(IEnumerable<BeaconLocation> beacons)
     {
-        if (beacons.Any())
+        var beaconLocations = beacons as BeaconLocation[] ?? beacons.ToArray();
+        _beaconLocations = _beaconLocations.Union(beaconLocations.Where(b => !string.IsNullOrEmpty(b.Data))).ToList();
+        if (_beaconLocations.Any())
         {
-            foreach (var beacon in beacons.Where(b => !string.IsNullOrEmpty(b.Data)).ToArray())
+            var _listdevices = new List<DeviceModel>();
+            foreach (var beaconLocation in _beaconLocations)
             {
-                var spData = beacon.Data.Split("-");
-                if (spData.Length < 2)
+                var spData = beaconLocation.Data.Split("-").Select(l => l.Trim()).ToArray();
+                if (spData.Count() < 2)
                     continue;
-
                 var deviceName = spData[1];
                 var plaatform = spData[0];
 
+
                 var device = new DeviceModel
                 {
-                    Host = beacon.Address.Address.ToString(),
+                    Host = beaconLocation.Address.Address.ToString(),
                     Name = deviceName,
                     Os = $"{plaatform.ToLower()}",
-                    Port = beacon.Address.Port.ToString(),
+                    Port = beaconLocation.Address.Port.ToString(),
                     Ping = 0
                 };
-                if (_devices.FirstOrDefault(d => d.Host == device.Host && d.Port == device.Port) == null)
-                    _devices.Add(device);
+                _listdevices.Add(device);
             }
+
+            foreach (var deviceModel in _listdevices.Union(_listdevices))
+                if (_devices.FirstOrDefault(d =>
+                        d.Host == deviceModel.Host && !string.IsNullOrEmpty(deviceModel.Host)) == null)
+                    _devices.Add(deviceModel);
         }
 
+
+        var deviceLines = string.Join("\n", _devices.Select(d => d.ToLineString()));
+        StorageHelper.WriteToFile("devices.txt", deviceLines);
         DevicesUpdated?.Invoke(_devices);
     }
-
 
     public IPAddress? AndroidGetLocalIp()
     {
         if (OperatingSystem.IsAndroid())
         {
-            var allNetworkInterfaces = Collections.List(Java.Net.NetworkInterface.NetworkInterfaces);
+            var allNetworkInterfaces = Collections.List(NetworkInterface.NetworkInterfaces);
 
             foreach (var interfaces in allNetworkInterfaces)
             {
-                var addressInterface = (interfaces as Java.Net.NetworkInterface)?.InterfaceAddresses;
+                var addressInterface = (interfaces as NetworkInterface)?.InterfaceAddresses;
                 if (addressInterface != null)
                 {
                     var arrayAdress = addressInterface.Where(i => i.Broadcast != null)
@@ -133,10 +147,7 @@ public class MultiConnectionService : IDisposable
                     if (!enumerable.Any())
                         continue;
 
-                    if (IPAddress.TryParse(enumerable.First(), out IPAddress? ip) && ip != null)
-                    {
-                        return ip;
-                    }
+                    if (IPAddress.TryParse(enumerable.First(), out var ip) && ip != null) return ip;
                 }
             }
         }
@@ -144,11 +155,24 @@ public class MultiConnectionService : IDisposable
         return null;
     }
 
-
-    public void Dispose()
+    public void LoadedLastDevices()
     {
-        CloseAll();
-        GC.SuppressFinalize(this);
-        GC.Collect();
+        try
+        {
+            foreach (var line in StorageHelper.ReadFile("devices.txt").Split('\n').Select(a => a.Trim())
+                         .Where(a => !string.IsNullOrWhiteSpace(a))
+                    )
+            {
+                var _device = DeviceModel.Parse(line.Trim());
+                if (_devices.FirstOrDefault(d => d.Host == _device.Host && !string.IsNullOrEmpty(_device.Host)) == null)
+                    _devices.Add(_device);
+            }
+
+            DevicesUpdated?.Invoke(_devices);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 }

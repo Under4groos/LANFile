@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -14,11 +12,10 @@ namespace LANFile.Views.Controls;
 
 public class SelectFiles : ContentControl
 {
-    private Button? _buttonSelectFile;
-
-
     public static readonly StyledProperty<ObservableCollection<string>> FilesProperty =
         AvaloniaProperty.Register<LanDevice, ObservableCollection<string>>(nameof(Files));
+
+    private Button? _buttonSelectFile;
 
     public ObservableCollection<string> Files
     {

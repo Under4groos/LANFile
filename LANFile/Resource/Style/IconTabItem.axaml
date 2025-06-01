@@ -2,20 +2,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:LANFile.Views.Controls">
     <Design.PreviewWith>
-        <Border >
+        <Border>
             <!-- Add Controls for Previewer Here -->
         </Border>
     </Design.PreviewWith>
 
     <Style Selector="controls|IconTabItem.Buttom">
-       <Setter Property="WidthSvg" Value="15"/>
-       <Setter Property="HeightSvg" Value="15"/>
-       <Setter Property="TextMinWidth" Value="120"/>
-       <Setter Property="TextMargin" Value="1"/>
-       <Setter Property="BorderMargin" Value="0"/>
-       
-       <Setter Property="BorderThickness" Value="1"/>
-       <Setter Property="CornerRadius" Value="4"/>
-      
+        <Setter Property="WidthSvg" Value="15" />
+        <Setter Property="HeightSvg" Value="15" />
+        <Setter Property="TextMinWidth" Value="120" />
+        <Setter Property="TextMargin" Value="1" />
+        <Setter Property="BorderMargin" Value="0" />
+
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+
     </Style>
 </Styles>

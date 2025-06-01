@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Net.NetworkInformation;
-using System.Reactive.Concurrency;
 using System.Threading;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using LANFile.Helper;
-using LANFile.Models;
 using SuperSimpleTcp;
 
 namespace LANFile.Views.Controls;
@@ -20,15 +17,35 @@ public class LanDevice : ContentControl
     public static readonly StyledProperty<string> ConnectNameProperty =
         AvaloniaProperty.Register<LanDevice, string>(nameof(ConnectName));
 
+
+    public static readonly StyledProperty<string> OsProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(OsProperty));
+
+
+    public static readonly StyledProperty<string> PortProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(Port));
+
+    public static readonly StyledProperty<string> HostProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(Host));
+
+
+    public static readonly StyledProperty<string> PingProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(Ping), "0ms");
+
+    public static readonly StyledProperty<string> HttpResultProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(HttpResult), "<null>");
+
+    private SimpleTcpClient? _simpleTcpClient;
+    private Thread? _thread;
+
+
+    private WrapPanel? _wrapPanel;
+
     public string ConnectName
     {
         get => GetValue(ConnectNameProperty);
         set => SetValue(ConnectNameProperty, value);
     }
-
-
-    public static readonly StyledProperty<string> OsProperty =
-        AvaloniaProperty.Register<LanDevice, string>(nameof(OsProperty));
 
     public string Os
     {
@@ -36,18 +53,11 @@ public class LanDevice : ContentControl
         set => SetValue(OsProperty, value);
     }
 
-
-    public static readonly StyledProperty<string> PortProperty =
-        AvaloniaProperty.Register<LanDevice, string>(nameof(Port));
-
     public string Port
     {
         get => GetValue(PortProperty);
         set => SetValue(PortProperty, value);
     }
-
-    public static readonly StyledProperty<string> HostProperty =
-        AvaloniaProperty.Register<LanDevice, string>(nameof(Host));
 
     public string Host
     {
@@ -55,29 +65,17 @@ public class LanDevice : ContentControl
         set => SetValue(HostProperty, value);
     }
 
-
-    public static readonly StyledProperty<string> PingProperty =
-        AvaloniaProperty.Register<LanDevice, string>(nameof(Ping), "0ms");
-
     public string Ping
     {
         get => GetValue(PingProperty);
         set => SetValue(PingProperty, value);
     }
 
-    public static readonly StyledProperty<string> HttpResultProperty =
-        AvaloniaProperty.Register<LanDevice, string>(nameof(HttpResult), "<null>");
-
     public string HttpResult
     {
         get => GetValue(HttpResultProperty);
         set => SetValue(HttpResultProperty, value);
     }
-
-
-    private WrapPanel? _wrapPanel;
-    private Thread? _thread;
-    private SimpleTcpClient? _simpleTcpClient;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {

@@ -1,9 +1,9 @@
-﻿namespace SuperSimpleTcp;
+﻿using System;
 
-using System;
+namespace SuperSimpleTcp;
 
 /// <summary>
-/// Arguments for connection events.
+///     Arguments for connection events.
 /// </summary>
 public class ConnectionEventArgs : EventArgs
 {
@@ -14,12 +14,12 @@ public class ConnectionEventArgs : EventArgs
     }
 
     /// <summary>
-    /// The IP address and port number of the connected peer socket.
+    ///     The IP address and port number of the connected peer socket.
     /// </summary>
     public string IpPort { get; }
 
     /// <summary>
-    /// The reason for the disconnection, if any.
+    ///     The reason for the disconnection, if any.
     /// </summary>
     public DisconnectReason Reason { get; } = DisconnectReason.None;
 }

@@ -19,12 +19,11 @@
                 <Border x:Name="PART_BorderPresenter"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         BorderBrush="{TemplateBinding BorderBrush}"
-                        CornerRadius="{TemplateBinding CornerRadius}"
-                        >
+                        CornerRadius="{TemplateBinding CornerRadius}">
                     <Grid>
                         <StackPanel Margin="{TemplateBinding BorderMargin}">
                             <Svg x:Name="_svg"
-                             
+
                                  Width="{TemplateBinding WidthSvg}"
                                  Height="{TemplateBinding HeightSvg}"
                                  Path="{TemplateBinding Source}"

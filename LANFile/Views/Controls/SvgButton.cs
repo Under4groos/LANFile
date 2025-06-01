@@ -30,9 +30,8 @@ public class SvgButton : Button
         get => GetValue(BorderMarginProperty);
         set => SetValue(BorderMarginProperty, value);
     }
-    
-    
-    
+
+
     public double WidthSvg
     {
         get => GetValue(WidthSvgProperty);

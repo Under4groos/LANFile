@@ -4,7 +4,7 @@
     <!-- https://github.com/AvaloniaUI/Avalonia/blob/513d1d96ecdcb121b160b81d412e4ea785c3daae/src/Avalonia.Themes.Fluent/Controls/TabItem.xaml#L46 -->
     <Style Selector="TabControl /template/ WrapPanel">
         <Setter Property="HorizontalAlignment" Value="Center" />
-        
+
         <Setter Property="Orientation" Value="Horizontal" />
     </Style>
     <Style Selector="TabControl">
@@ -12,6 +12,6 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="TabStripPlacement" Value="Bottom" />
     </Style>
-    
-    
+
+
 </Styles>

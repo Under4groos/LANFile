@@ -33,7 +33,7 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
-                    <Grid RowDefinitions="Auto,Auto" >
+                    <Grid RowDefinitions="Auto,Auto">
                         <Svg
                             Width="{TemplateBinding WidthSvg}"
                             Height="{TemplateBinding HeightSvg}"
@@ -44,10 +44,10 @@
                             <ContentPresenter Name="PART_ContentPresenter"
                                               Margin="{TemplateBinding TextMargin}"
                                               Foreground="{TemplateBinding Foreground}"
-                                             
+
                                               HorizontalAlignment="Stretch"
                                               HorizontalContentAlignment="Center"
-                                             
+
                                               Content="{TemplateBinding Header}"
                                               RecognizesAccessKey="True" />
                         </Grid>

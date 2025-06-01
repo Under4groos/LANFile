@@ -1,27 +1,27 @@
 ﻿namespace SuperSimpleTcp;
 
 /// <summary>
-/// Reason why a client disconnected.
+///     Reason why a client disconnected.
 /// </summary>
 public enum DisconnectReason
 {
     /// <summary>
-    /// Normal disconnection.
+    ///     Normal disconnection.
     /// </summary>
     Normal = 0,
 
     /// <summary>
-    /// Client connection was intentionally terminated programmatically or by the server.
+    ///     Client connection was intentionally terminated programmatically or by the server.
     /// </summary>
     Kicked = 1,
 
     /// <summary>
-    /// Client connection timed out; server did not receive data within the timeout window.
+    ///     Client connection timed out; server did not receive data within the timeout window.
     /// </summary>
     Timeout = 2,
 
     /// <summary>
-    /// The connection was not disconnected.
+    ///     The connection was not disconnected.
     /// </summary>
     None = 3
 }

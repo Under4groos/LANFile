@@ -1,6 +1,4 @@
-﻿namespace SuperSimpleTcp;
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -16,22 +14,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace SuperSimpleTcp;
+
 /// <summary>
-/// SimpleTcp server with SSL support.  
-/// Set the ClientConnected, ClientDisconnected, and DataReceived events.  
-/// Once set, use Start() to begin listening for connections.
+///     SimpleTcp server with SSL support.
+///     Set the ClientConnected, ClientDisconnected, and DataReceived events.
+///     Once set, use Start() to begin listening for connections.
 /// </summary>
 public class SimpleTcpServer : IDisposable
 {
     #region Public-Members
 
     /// <summary>
-    /// Indicates if the server is listening for connections.
+    ///     Indicates if the server is listening for connections.
     /// </summary>
-    public bool IsListening => _isListening;
+    public bool IsListening { get; private set; }
 
     /// <summary>
-    /// SimpleTcp server settings.
+    ///     SimpleTcp server settings.
     /// </summary>
     public SimpleTcpServerSettings Settings
     {
@@ -44,7 +44,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// SimpleTcp server events.
+    ///     SimpleTcp server events.
     /// </summary>
     public SimpleTcpServerEvents Events
     {
@@ -57,12 +57,12 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// SimpleTcp statistics.
+    ///     SimpleTcp statistics.
     /// </summary>
-    public SimpleTcpStatistics Statistics => _statistics;
+    public SimpleTcpStatistics Statistics { get; private set; } = new();
 
     /// <summary>
-    /// SimpleTcp keepalive settings.
+    ///     SimpleTcp keepalive settings.
     /// </summary>
     public SimpleTcpKeepaliveSettings Keepalive
     {
@@ -75,27 +75,27 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Retrieve the number of current connected clients.
+    ///     Retrieve the number of current connected clients.
     /// </summary>
     public int Connections => _clients.Count;
 
     /// <summary>
-    /// The IP address on which the server is configured to listen.
+    ///     The IP address on which the server is configured to listen.
     /// </summary>
     public IPAddress IpAddress => _ipAddress;
 
     /// <summary>
-    /// The IPEndPoint on which the server is configured to listen.
+    ///     The IPEndPoint on which the server is configured to listen.
     /// </summary>
     public EndPoint Endpoint => _listener == null ? null : (IPEndPoint)_listener.LocalEndpoint;
 
     /// <summary>
-    /// The port on which the server is configured to listen.
+    ///     The port on which the server is configured to listen.
     /// </summary>
     public int Port => _listener == null ? 0 : ((IPEndPoint)_listener.LocalEndpoint).Port;
 
     /// <summary>
-    /// Method to invoke to send a log message.
+    ///     Method to invoke to send a log message.
     /// </summary>
     public Action<string> Logger = null;
 
@@ -107,39 +107,38 @@ public class SimpleTcpServer : IDisposable
     private SimpleTcpServerSettings _settings = new();
     private SimpleTcpServerEvents _events = new();
     private SimpleTcpKeepaliveSettings _keepalive = new();
-    private SimpleTcpStatistics _statistics = new();
 
-    private readonly string _listenerIp = null;
-    private readonly IPAddress _ipAddress = null;
-    private readonly int _port = 0;
-    private readonly bool _ssl = false;
+    private readonly string _listenerIp;
+    private readonly IPAddress _ipAddress;
+    private readonly int _port;
+    private readonly bool _ssl;
 
-    private readonly X509Certificate2 _sslCertificate = null;
-    private readonly X509Certificate2Collection _sslCertificateCollection = null;
+    private readonly X509Certificate2 _sslCertificate;
+    private readonly X509Certificate2Collection _sslCertificateCollection;
 
     private readonly ConcurrentDictionary<string, ClientMetadata> _clients = new();
     private readonly ConcurrentDictionary<string, DateTime> _clientsLastSeen = new();
     private readonly ConcurrentDictionary<string, DateTime> _clientsKicked = new();
     private readonly ConcurrentDictionary<string, DateTime> _clientsTimedout = new();
 
-    private TcpListener _listener = null;
-    private bool _isListening = false;
+    private TcpListener _listener;
 
     private CancellationTokenSource _tokenSource = new();
     private CancellationToken _token;
     private CancellationTokenSource _listenerTokenSource = new();
     private CancellationToken _listenerToken;
-    private Task _acceptConnections = null;
-    private Task _idleClientMonitor = null;
+    private Task _acceptConnections;
+    private Task _idleClientMonitor;
 
     #endregion
 
     #region Constructors-and-Factories
 
     /// <summary>
-    /// Instantiates the TCP server without SSL.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set, use Start() to begin listening for connections.
+    ///     Instantiates the TCP server without SSL.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.
+    ///     Once set, use Start() to begin listening for connections.
     /// </summary>
-    /// <param name="ipPort">The IP:port of the server.</param> 
+    /// <param name="ipPort">The IP:port of the server.</param>
     public SimpleTcpServer(string ipPort)
     {
         if (string.IsNullOrEmpty(ipPort)) throw new ArgumentNullException(nameof(ipPort));
@@ -165,12 +164,13 @@ public class SimpleTcpServer : IDisposable
             }
         }
 
-        _isListening = false;
+        IsListening = false;
         _token = _tokenSource.Token;
     }
 
     /// <summary>
-    /// Instantiates the TCP server without SSL.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set, use Start() to begin listening for connections.
+    ///     Instantiates the TCP server without SSL.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.
+    ///     Once set, use Start() to begin listening for connections.
     /// </summary>
     /// <param name="listenerIp">The listener IP address or hostname.</param>
     /// <param name="port">The TCP port on which to listen.</param>
@@ -200,14 +200,15 @@ public class SimpleTcpServer : IDisposable
             }
         }
 
-        _isListening = false;
+        IsListening = false;
         _token = _tokenSource.Token;
     }
 
     /// <summary>
-    /// Instantiates the TCP server.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set, use Start() to begin listening for connections.
+    ///     Instantiates the TCP server.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set,
+    ///     use Start() to begin listening for connections.
     /// </summary>
-    /// <param name="ipPort">The IP:port of the server.</param> 
+    /// <param name="ipPort">The IP:port of the server.</param>
     /// <param name="ssl">Enable or disable SSL.</param>
     /// <param name="pfxCertFilename">The filename of the PFX certificate file.</param>
     /// <param name="pfxPassword">The password to the PFX certificate file.</param>
@@ -237,7 +238,7 @@ public class SimpleTcpServer : IDisposable
         }
 
         _ssl = ssl;
-        _isListening = false;
+        IsListening = false;
         _token = _tokenSource.Token;
 
         if (_ssl)
@@ -255,7 +256,8 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP server.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set, use Start() to begin listening for connections.
+    ///     Instantiates the TCP server.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set,
+    ///     use Start() to begin listening for connections.
     /// </summary>
     /// <param name="listenerIp">The listener IP address or hostname.</param>
     /// <param name="port">The TCP port on which to listen.</param>
@@ -288,7 +290,7 @@ public class SimpleTcpServer : IDisposable
         }
 
         _ssl = ssl;
-        _isListening = false;
+        IsListening = false;
         _token = _tokenSource.Token;
 
         if (_ssl)
@@ -306,7 +308,8 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Instantiates the TCP server with SSL.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.  Once set, use Start() to begin listening for connections.
+    ///     Instantiates the TCP server with SSL.  Set the ClientConnected, ClientDisconnected, and DataReceived callbacks.
+    ///     Once set, use Start() to begin listening for connections.
     /// </summary>
     /// <param name="listenerIp">The listener IP address or hostname.</param>
     /// <param name="port">The TCP port on which to listen.</param>
@@ -344,7 +347,7 @@ public class SimpleTcpServer : IDisposable
             _sslCertificate
         };
 
-        _isListening = false;
+        IsListening = false;
         _token = _tokenSource.Token;
     }
 
@@ -353,7 +356,7 @@ public class SimpleTcpServer : IDisposable
     #region Public-Methods
 
     /// <summary>
-    /// Dispose of the TCP server.
+    ///     Dispose of the TCP server.
     /// </summary>
     public void Dispose()
     {
@@ -362,23 +365,23 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Start accepting connections.
+    ///     Start accepting connections.
     /// </summary>
     public void Start()
     {
-        if (_isListening) throw new InvalidOperationException("SimpleTcpServer is already running.");
+        if (IsListening) throw new InvalidOperationException("SimpleTcpServer is already running.");
 
         _listener = new TcpListener(_ipAddress, _port);
         _listener.Server.NoDelay = _settings.NoDelay;
         _listener.Start();
-        _isListening = true;
+        IsListening = true;
 
         _tokenSource = new CancellationTokenSource();
         _token = _tokenSource.Token;
         _listenerTokenSource = new CancellationTokenSource();
         _listenerToken = _listenerTokenSource.Token;
 
-        _statistics = new SimpleTcpStatistics();
+        Statistics = new SimpleTcpStatistics();
 
         if (_idleClientMonitor == null) _idleClientMonitor = Task.Run(() => IdleClientMonitor(), _token);
 
@@ -386,26 +389,26 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Start accepting connections.
+    ///     Start accepting connections.
     /// </summary>
     /// <returns>Task.</returns>
     public Task StartAsync()
     {
-        if (_isListening) throw new InvalidOperationException("SimpleTcpServer is already running.");
+        if (IsListening) throw new InvalidOperationException("SimpleTcpServer is already running.");
 
         _listener = new TcpListener(_ipAddress, _port);
 
         if (_keepalive.EnableTcpKeepAlives) EnableKeepalives();
 
         _listener.Start();
-        _isListening = true;
+        IsListening = true;
 
         _tokenSource = new CancellationTokenSource();
         _token = _tokenSource.Token;
         _listenerTokenSource = new CancellationTokenSource();
         _listenerToken = _listenerTokenSource.Token;
 
-        _statistics = new SimpleTcpStatistics();
+        Statistics = new SimpleTcpStatistics();
 
         if (_idleClientMonitor == null) _idleClientMonitor = Task.Run(() => IdleClientMonitor(), _token);
 
@@ -414,11 +417,11 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Stop accepting new connections.
+    ///     Stop accepting new connections.
     /// </summary>
     public void Stop()
     {
-        _isListening = false;
+        IsListening = false;
 
         _listener.Stop();
         _listenerTokenSource.Cancel();
@@ -429,7 +432,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Retrieve a list of client IP:port connected to the server.
+    ///     Retrieve a list of client IP:port connected to the server.
     /// </summary>
     /// <returns>IEnumerable of strings, each containing client IP:port.</returns>
     public IEnumerable<string> GetClients()
@@ -439,7 +442,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Determines if a client is connected by its IP:port.
+    ///     Determines if a client is connected by its IP:port.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <returns>True if connected.</returns>
@@ -451,7 +454,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Send data to the specified client by IP:port.
+    ///     Send data to the specified client by IP:port.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <param name="data">String containing data to send.</param>
@@ -470,7 +473,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Send data to the specified client by IP:port.
+    ///     Send data to the specified client by IP:port.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <param name="data">Byte array containing data to send.</param>
@@ -488,7 +491,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Send data to the specified client by IP:port.
+    ///     Send data to the specified client by IP:port.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <param name="contentLength">The number of bytes to read from the source stream to send.</param>
@@ -504,7 +507,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Send data to the specified client by IP:port asynchronously.
+    ///     Send data to the specified client by IP:port asynchronously.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <param name="data">String containing data to send.</param>
@@ -525,7 +528,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Send data to the specified client by IP:port asynchronously.
+    ///     Send data to the specified client by IP:port asynchronously.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <param name="data">Byte array containing data to send.</param>
@@ -545,7 +548,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Send data to the specified client by IP:port asynchronously.
+    ///     Send data to the specified client by IP:port asynchronously.
     /// </summary>
     /// <param name="ipPort">The client IP:port string.</param>
     /// <param name="contentLength">The number of bytes to read from the source stream to send.</param>
@@ -563,7 +566,7 @@ public class SimpleTcpServer : IDisposable
     }
 
     /// <summary>
-    /// Disconnects the specified client.
+    ///     Disconnects the specified client.
     /// </summary>
     /// <param name="ipPort">IP:port of the client.</param>
     public void DisconnectClient(string ipPort)
@@ -600,7 +603,7 @@ public class SimpleTcpServer : IDisposable
     #region Private-Methods
 
     /// <summary>
-    /// Dispose of the TCP server.
+    ///     Dispose of the TCP server.
     /// </summary>
     /// <param name="disposing">Dispose of resources.</param>
     protected virtual void Dispose(bool disposing)
@@ -636,7 +639,7 @@ public class SimpleTcpServer : IDisposable
                 Logger?.Invoke($"{_header}dispose exception:{Environment.NewLine}{e}{Environment.NewLine}");
             }
 
-            _isListening = false;
+            IsListening = false;
 
             Logger?.Invoke($"{_header}disposed");
         }
@@ -666,8 +669,7 @@ public class SimpleTcpServer : IDisposable
             var buffer = new byte[1];
             if (client.Client.Receive(buffer, SocketFlags.Peek) == 0)
                 return false;
-            else
-                return true;
+            return true;
         }
 
         return false;
@@ -683,15 +685,16 @@ public class SimpleTcpServer : IDisposable
             {
                 #region Check-for-Maximum-Connections
 
-                if (!_isListening && _clients.Count >= _settings.MaxConnections)
+                if (!IsListening && _clients.Count >= _settings.MaxConnections)
                 {
                     Task.Delay(100).Wait();
                     continue;
                 }
-                else if (!_isListening)
+
+                if (!IsListening)
                 {
                     _listener.Start();
-                    _isListening = true;
+                    IsListening = true;
                 }
 
                 #endregion
@@ -723,10 +726,10 @@ public class SimpleTcpServer : IDisposable
                 {
                     if (_settings.AcceptInvalidCertificates)
                         client.SslStream = new SslStream(client.NetworkStream, false,
-                            new RemoteCertificateValidationCallback(AcceptCertificate));
+                            AcceptCertificate);
                     else if (_settings.CertificateValidationCallback != null)
                         client.SslStream = new SslStream(client.NetworkStream, false,
-                            new RemoteCertificateValidationCallback(_settings.CertificateValidationCallback));
+                            _settings.CertificateValidationCallback);
                     else
                         client.SslStream = new SslStream(client.NetworkStream, false);
 
@@ -757,7 +760,7 @@ public class SimpleTcpServer : IDisposable
                 {
                     Logger?.Invoke(
                         $"{_header}maximum connections {_settings.MaxConnections} met (currently {_clients.Count} connections), pausing");
-                    _isListening = false;
+                    IsListening = false;
                     _listener.Stop();
                 }
 
@@ -770,21 +773,18 @@ public class SimpleTcpServer : IDisposable
                     || ex is ObjectDisposedException
                     || ex is InvalidOperationException)
                 {
-                    _isListening = false;
+                    IsListening = false;
                     if (client != null) client.Dispose();
                     Logger?.Invoke($"{_header}stopped listening");
                     break;
                 }
-                else
-                {
-                    if (client != null) client.Dispose();
-                    Logger?.Invoke($"{_header}exception while awaiting connections: {ex}");
-                    continue;
-                }
+
+                if (client != null) client.Dispose();
+                Logger?.Invoke($"{_header}exception while awaiting connections: {ex}");
             }
         }
 
-        _isListening = false;
+        IsListening = false;
     }
 
     private async Task<bool> StartTls(ClientMetadata client, CancellationToken token)
@@ -874,7 +874,7 @@ public class SimpleTcpServer : IDisposable
                 else
                     action.Invoke();
 
-                _statistics.ReceivedBytes += data.Count;
+                Statistics.ReceivedBytes += data.Count;
                 UpdateClientLastSeen(client.IpPort);
             }
             catch (IOException)
@@ -938,10 +938,8 @@ public class SimpleTcpServer : IDisposable
                         await ms.WriteAsync(buffer, 0, read, token).ConfigureAwait(false);
                         return new ArraySegment<byte>(ms.GetBuffer(), 0, (int)ms.Length);
                     }
-                    else
-                    {
-                        throw new SocketException();
-                    }
+
+                    throw new SocketException();
                 }
             }
         else
@@ -956,10 +954,8 @@ public class SimpleTcpServer : IDisposable
                         await ms.WriteAsync(buffer, 0, read, token).ConfigureAwait(false);
                         return new ArraySegment<byte>(ms.GetBuffer(), 0, (int)ms.Length);
                     }
-                    else
-                    {
-                        throw new SocketException();
-                    }
+
+                    throw new SocketException();
                 }
             }
     }
@@ -1020,7 +1016,7 @@ public class SimpleTcpServer : IDisposable
                     else client.SslStream.Write(buffer, 0, bytesRead);
 
                     bytesRemaining -= bytesRead;
-                    _statistics.SentBytes += bytesRead;
+                    Statistics.SentBytes += bytesRead;
                 }
             }
 
@@ -1058,7 +1054,7 @@ public class SimpleTcpServer : IDisposable
                     else await client.SslStream.WriteAsync(buffer, 0, bytesRead, token).ConfigureAwait(false);
 
                     bytesRemaining -= bytesRead;
-                    _statistics.SentBytes += bytesRead;
+                    Statistics.SentBytes += bytesRead;
                 }
             }
 

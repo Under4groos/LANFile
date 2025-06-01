@@ -1,6 +1,6 @@
-﻿namespace SuperSimpleTcp;
+﻿using System;
 
-using System;
+namespace SuperSimpleTcp;
 
 internal static class Common
 {

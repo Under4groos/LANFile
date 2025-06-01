@@ -22,14 +22,15 @@ public class Probe : IDisposable
     /// </summary>
     private static readonly TimeSpan BeaconTimeout = new(0, 0, 0, 5); // seconds
 
-    private Task _mainTask;
+    private readonly CancellationToken _cancellationToken;
+
+
+    private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly UdpClient _udp = new();
     private readonly EventWaitHandle _waitHandle = new(false, EventResetMode.AutoReset);
     private IEnumerable<BeaconLocation> _currentBeacons = Enumerable.Empty<BeaconLocation>();
 
-
-    private CancellationTokenSource _cancellationTokenSource;
-    private CancellationToken _cancellationToken;
+    private Task _mainTask;
 
     public Probe(string beaconType, IPAddress endAny = null, bool isBackground = false)
     {

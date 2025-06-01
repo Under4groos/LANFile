@@ -47,15 +47,14 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                
-                                    <controls:LanDevice Theme="{StaticResource LanDevice}"
-                                                        ConnectName="{Binding Name}"
 
-                                                        Os="{Binding Os}"
-                                                        Port="{Binding Port}"
-                                                        Host="{Binding Host}" />
+                                <controls:LanDevice Theme="{StaticResource LanDevice}"
+                                                    ConnectName="{Binding Name}"
 
-                                 
+                                                    Os="{Binding Os}"
+                                                    Port="{Binding Port}"
+                                                    Host="{Binding Host}" />
+
 
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

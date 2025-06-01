@@ -1,44 +1,44 @@
-﻿namespace SuperSimpleTcp;
+﻿using System;
 
-using System;
+namespace SuperSimpleTcp;
 
 /// <summary>
-/// SimpleTcp client events.
+///     SimpleTcp client events.
 /// </summary>
 public class SimpleTcpClientEvents
 {
-    #region Public-Members
-
-    /// <summary>
-    /// Event to call when the connection is established.
-    /// </summary>
-    public event EventHandler<ConnectionEventArgs> Connected;
-
-    /// <summary>
-    /// Event to call when the connection is destroyed.
-    /// </summary>
-    public event EventHandler<ConnectionEventArgs> Disconnected;
-
-    /// <summary>
-    /// Event to call when byte data has become available from the server.
-    /// </summary>
-    public event EventHandler<DataReceivedEventArgs> DataReceived;
-
-    /// <summary>
-    /// Event to call when byte data has been sent to the server.
-    /// </summary>
-    public event EventHandler<DataSentEventArgs> DataSent;
-
-    #endregion
-
     #region Constructors-and-Factories
 
     /// <summary>
-    /// Instantiate the object.
+    ///     Instantiate the object.
     /// </summary>
     public SimpleTcpClientEvents()
     {
     }
+
+    #endregion
+
+    #region Public-Members
+
+    /// <summary>
+    ///     Event to call when the connection is established.
+    /// </summary>
+    public event EventHandler<ConnectionEventArgs> Connected;
+
+    /// <summary>
+    ///     Event to call when the connection is destroyed.
+    /// </summary>
+    public event EventHandler<ConnectionEventArgs> Disconnected;
+
+    /// <summary>
+    ///     Event to call when byte data has become available from the server.
+    /// </summary>
+    public event EventHandler<DataReceivedEventArgs> DataReceived;
+
+    /// <summary>
+    ///     Event to call when byte data has been sent to the server.
+    /// </summary>
+    public event EventHandler<DataSentEventArgs> DataSent;
 
     #endregion
 

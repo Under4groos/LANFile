@@ -13,7 +13,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Resource/Colors.axaml" />
-               
+
                 <ResourceInclude Source="/Resource/Templates/LanDevice.axaml" />
                 <ResourceInclude Source="/Resource/Templates/SelectFiles.axaml" />
                 <ResourceInclude Source="/Resource/Templates/Button.axaml" />

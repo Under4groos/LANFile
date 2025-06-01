@@ -1,9 +1,9 @@
-﻿namespace SuperSimpleTcp;
+﻿using System;
 
-using System;
+namespace SuperSimpleTcp;
 
 /// <summary>
-/// Arguments for data received from connected endpoints.
+///     Arguments for data received from connected endpoints.
 /// </summary>
 public class DataReceivedEventArgs : EventArgs
 {
@@ -14,12 +14,12 @@ public class DataReceivedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// The IP address and port number of the connected endpoint.
+    ///     The IP address and port number of the connected endpoint.
     /// </summary>
     public string IpPort { get; }
 
     /// <summary>
-    /// The data received from the endpoint.
+    ///     The data received from the endpoint.
     /// </summary>
     public ArraySegment<byte> Data { get; }
 }

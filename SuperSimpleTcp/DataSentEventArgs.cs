@@ -1,9 +1,9 @@
-﻿namespace SuperSimpleTcp;
+﻿using System;
 
-using System;
+namespace SuperSimpleTcp;
 
 /// <summary>
-/// Arguments for data sent to a connected endpoint.
+///     Arguments for data sent to a connected endpoint.
 /// </summary>
 public class DataSentEventArgs : EventArgs
 {
@@ -14,12 +14,12 @@ public class DataSentEventArgs : EventArgs
     }
 
     /// <summary>
-    /// The IP address and port number of the connected endpoint.
+    ///     The IP address and port number of the connected endpoint.
     /// </summary>
     public string IpPort { get; }
 
     /// <summary>
-    /// The number of bytes sent.
+    ///     The number of bytes sent.
     /// </summary>
     public long BytesSent { get; }
 }

@@ -1,53 +1,21 @@
-﻿namespace SuperSimpleTcp;
-
-using System;
+﻿using System;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
 
+namespace SuperSimpleTcp;
+
 internal class ClientMetadata : IDisposable
 {
-    #region Public-Members
-
-    internal TcpClient Client => _tcpClient;
-
-    internal NetworkStream NetworkStream => _networkStream;
-
-    internal SslStream SslStream
-    {
-        get => _sslStream;
-        set => _sslStream = value;
-    }
-
-    internal string IpPort => _ipPort;
-
-    internal SemaphoreSlim SendLock = new(1, 1);
-    internal SemaphoreSlim ReceiveLock = new(1, 1);
-
-    internal CancellationTokenSource TokenSource { get; set; }
-
-    internal CancellationToken Token { get; set; }
-
-    #endregion
-
-    #region Private-Members
-
-    private TcpClient _tcpClient = null;
-    private NetworkStream _networkStream = null;
-    private SslStream _sslStream = null;
-    private string _ipPort = null;
-
-    #endregion
-
     #region Constructors-and-Factories
 
     internal ClientMetadata(TcpClient tcp)
     {
         if (tcp == null) throw new ArgumentNullException(nameof(tcp));
 
-        _tcpClient = tcp;
-        _networkStream = tcp.GetStream();
-        _ipPort = tcp.Client.RemoteEndPoint.ToString();
+        Client = tcp;
+        NetworkStream = tcp.GetStream();
+        IpPort = tcp.Client.RemoteEndPoint.ToString();
         TokenSource = new CancellationTokenSource();
         Token = TokenSource.Token;
     }
@@ -65,19 +33,42 @@ internal class ClientMetadata : IDisposable
                 TokenSource.Dispose();
             }
 
-        if (_sslStream != null) _sslStream.Close();
+        if (SslStream != null) SslStream.Close();
 
-        if (_networkStream != null) _networkStream.Close();
+        if (NetworkStream != null) NetworkStream.Close();
 
-        if (_tcpClient != null)
+        if (Client != null)
         {
-            _tcpClient.Close();
-            _tcpClient.Dispose();
+            Client.Close();
+            Client.Dispose();
         }
 
         SendLock.Dispose();
         ReceiveLock.Dispose();
     }
+
+    #endregion
+
+    #region Public-Members
+
+    internal TcpClient Client { get; }
+
+    internal NetworkStream NetworkStream { get; }
+
+    internal SslStream SslStream { get; set; }
+
+    internal string IpPort { get; }
+
+    internal SemaphoreSlim SendLock = new(1, 1);
+    internal SemaphoreSlim ReceiveLock = new(1, 1);
+
+    internal CancellationTokenSource TokenSource { get; set; }
+
+    internal CancellationToken Token { get; set; }
+
+    #endregion
+
+    #region Private-Members
 
     #endregion
 }

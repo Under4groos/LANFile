@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using Android.OS;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LANFile.Models;
 
@@ -9,11 +7,10 @@ namespace LANFile.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    [ObservableProperty] private string? _Title;
-    [ObservableProperty] private string? _Host;
+    private readonly Random R = new();
     [ObservableProperty] private ObservableCollection<DeviceModel> _devices = [];
-    
-    private Random R = new Random();
+    [ObservableProperty] private string? _Host;
+    [ObservableProperty] private string? _Title;
 
     public MainViewModel()
     {

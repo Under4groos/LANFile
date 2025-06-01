@@ -18,6 +18,18 @@ public class IconTabItem : TabItem
     public static readonly StyledProperty<double> HeightSvgProperty =
         AvaloniaProperty.Register<IconTabItem, double>(nameof(HeightSvg), 25);
 
+    public static readonly StyledProperty<double> TextMinWidthProperty =
+        AvaloniaProperty.Register<IconTabItem, double>(nameof(TextMinWidth), 25);
+
+    public static readonly StyledProperty<double> TextMinHeightProperty =
+        AvaloniaProperty.Register<IconTabItem, double>(nameof(TextMinHeight), 25);
+
+    public static readonly StyledProperty<Thickness> TextMarginProperty =
+        AvaloniaProperty.Register<IconTabItem, Thickness>(nameof(TextMargin), new Thickness(0));
+
+    public static readonly StyledProperty<Thickness> BorderMarginProperty =
+        AvaloniaProperty.Register<IconTabItem, Thickness>(nameof(BorderMargin), new Thickness(5));
+
     public double WidthSvg
     {
         get => GetValue(WidthSvgProperty);
@@ -30,12 +42,6 @@ public class IconTabItem : TabItem
         set => SetValue(HeightSvgProperty, value);
     }
 
-    public static readonly StyledProperty<double> TextMinWidthProperty =
-        AvaloniaProperty.Register<IconTabItem, double>(nameof(TextMinWidth), 25);
-
-    public static readonly StyledProperty<double> TextMinHeightProperty =
-        AvaloniaProperty.Register<IconTabItem, double>(nameof(TextMinHeight), 25);
-
     public double TextMinWidth
     {
         get => GetValue(TextMinWidthProperty);
@@ -47,28 +53,19 @@ public class IconTabItem : TabItem
         get => GetValue(TextMinHeightProperty);
         set => SetValue(TextMinHeightProperty, value);
     }
-    
-    public static readonly StyledProperty<Thickness> TextMarginProperty =
-        AvaloniaProperty.Register<IconTabItem, Thickness>(nameof(TextMargin), new Thickness(0));
 
     public Thickness TextMargin
     {
         get => GetValue(TextMarginProperty);
         set => SetValue(TextMarginProperty, value);
     }
-    
-    public static readonly StyledProperty<Thickness> BorderMarginProperty =
-        AvaloniaProperty.Register<IconTabItem, Thickness>(nameof(BorderMargin), new Thickness(5));
 
     public Thickness BorderMargin
     {
         get => GetValue(BorderMarginProperty);
         set => SetValue(BorderMarginProperty, value);
     }
-    
-    
-    
-   
+
 
     public string Source
     {
@@ -81,5 +78,4 @@ public class IconTabItem : TabItem
         get => GetValue(IconVisibleProperty);
         set => SetValue(IconVisibleProperty, value);
     }
-
 }
