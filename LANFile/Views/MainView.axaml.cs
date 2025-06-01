@@ -46,18 +46,30 @@ public partial class MainView : UserControl
             return;
 
         var header = (iconTabItem.Header?.ToString() ?? string.Empty).ToLower();
-
+        _multiConnectionService.CloseAll();
 
         switch (header)
         {
             case "upload":
                 _multiConnectionService.ProbeStart();
-                _multiConnectionService.TCPServerStart();
+                
                 break;
             case "download":
                 _multiConnectionService.BeaconStart();
 
                 break;
         }
+    }
+
+    private void ButtonClickStartUdpServer(object? sender, RoutedEventArgs e)
+    {
+        _multiConnectionService.TCPServerStart();
+    }
+
+    private void ButtonClickResetAll(object? sender, RoutedEventArgs e)
+    {
+        _multiConnectionService.CloseAll();
+        _multiConnectionService.ClearFileData();
+        _mainViewModel.Devices = new ObservableCollection<DeviceModel>();
     }
 }

@@ -101,16 +101,15 @@ public class LanDevice : ContentControl
     {
         try
         {
-            // if (_tcpClient != null && _tcpClient.IsConnected)
-            // {
-            //     _tcpClient.Disconnect();
-            //     _tcpClient.Dispose();
-            //     _tcpClient = null;
-            // }
-            //
-            //
-            // _tcpClient = new SimpleTcpClient($"{Host}:{Port}");
-            // _tcpClient.Connect();
+            if (_tcpClient != null && _tcpClient.IsConnected)
+            {
+                _tcpClient.Disconnect();
+                _tcpClient.Dispose();
+                _tcpClient = null;
+            }
+            
+            _tcpClient = new SimpleTcpClient($"{Host}:{Port}");
+            _tcpClient.Connect();
         }
         catch (Exception exception)
         {
@@ -130,7 +129,7 @@ public class LanDevice : ContentControl
             case "send":
 
 
-                //TCPClientConnect();
+                TCPClientConnect();
 
                 break;
             case "ping":

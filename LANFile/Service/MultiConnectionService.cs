@@ -81,6 +81,11 @@ public class MultiConnectionService : IDisposable
     {
         try
         {
+            if (_tcpServer.IsListening)
+            {
+                _tcpServer.Stop();
+            }
+
             if (!_tcpServer.IsListening)
                 _tcpServer?.Start();
         }
@@ -95,6 +100,7 @@ public class MultiConnectionService : IDisposable
     public void ProbeStart()
     {
         this.CloseAll();
+
         _probe = new Probe(ConnectionName, IPAddress.Any);
         _probe.BeaconsUpdated += ProbeOnBeaconsUpdated;
 
@@ -152,7 +158,8 @@ public class MultiConnectionService : IDisposable
                     Port = beaconLocation.Address.Port.ToString(),
                     IpTcpHost = ipHostTcp
                 };
-                _listdevices.Add(device);
+                if (device.Host != Host.ToString())
+                    _listdevices.Add(device);
             }
 
             foreach (var deviceModel in _listdevices.Union(_listdevices))
@@ -190,6 +197,13 @@ public class MultiConnectionService : IDisposable
         }
 
         return null;
+    }
+
+    public void ClearFileData()
+    {
+        StorageHelper.WriteToFile("devices.txt", "");
+        _devices.Clear();
+        _beaconLocations.Clear();
     }
 
     public void LoadedLastDevices()

@@ -15,14 +15,19 @@
     <Grid RowDefinitions="Auto,*" Margin="4">
         <Grid Grid.Row="0">
             <Border Classes="BorderM1" Margin="0,2,0,2">
-                <WrapPanel Margin="8" Orientation="Horizontal">
-                    <TextBlock Classes="F14L"
-                               Text="Name:" Padding="0" />
-                    <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
-                               Text="{Binding Title }" />
-                    <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
-                               Text="{Binding Host }" />
-                </WrapPanel>
+                <Grid>
+                    <WrapPanel Margin="8" Orientation="Horizontal">
+                        <TextBlock Classes="F14L"
+                                   Text="Name:" Padding="0" />
+                        <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
+                                   Text="{Binding Title }" />
+                        <TextBlock Classes="F14L" Padding="4,0,0,0" Foreground="#ff0a67"
+                                   Text="{Binding Host }" />
+                    </WrapPanel>
+
+                    <Button  HorizontalAlignment="Right" Click="ButtonClickResetAll">Clear</Button>
+                </Grid>
+              
             </Border>
         </Grid>
 
@@ -33,68 +38,72 @@
 
                                   Classes="Buttom"
                                   Source="/Assets/Svg/upload.svg">
-                <ScrollViewer>
+                <Grid>
+                    <ScrollViewer>
 
-                    <ItemsControl ItemsSource="{Binding  Devices}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel>
-                                    <VirtualizingStackPanel Orientation="Vertical" />
+                        <ItemsControl ItemsSource="{Binding  Devices}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel>
+                                        <VirtualizingStackPanel Orientation="Vertical" />
 
-                                </StackPanel>
+                                    </StackPanel>
 
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
 
-                                <controls:LanDevice Theme="{StaticResource LanDevice}"
-                                                    ConnectName="{Binding Name}"
-                                                    IpTcpHost="{Binding IpTcpHost}"
-                                                    Os="{Binding Os}"
-                                                    Port="{Binding Port}"
-                                                    Host="{Binding Host}"
-                                                    IsVisibilityButton="True"
-                                                    />
+                                    <controls:LanDevice Theme="{StaticResource LanDevice}"
+                                                        ConnectName="{Binding Name}"
+                                                        IpTcpHost="{Binding IpTcpHost}"
+                                                        Os="{Binding Os}"
+                                                        Port="{Binding Port}"
+                                                        Host="{Binding Host}"
+                                                        IsVisibilityButton="True" />
 
 
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                </Grid>
             </controls:IconTabItem>
             <controls:IconTabItem Header="Download"
                                   Classes="Buttom"
                                   Source="/Assets/Svg/download.svg">
-                <ScrollViewer>
+                <Grid RowDefinitions="*, Auto">
+                    <ScrollViewer>
 
-                    <ItemsControl ItemsSource="{Binding  Devices}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel>
-                                    <VirtualizingStackPanel Orientation="Vertical" />
+                        <ItemsControl ItemsSource="{Binding  Devices}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel>
+                                        <VirtualizingStackPanel Orientation="Vertical" />
 
-                                </StackPanel>
+                                    </StackPanel>
 
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
 
-                                <controls:LanDevice Theme="{StaticResource LanDevice}"
-                                                    ConnectName="{Binding Name}"
-                                                    IpTcpHost="{Binding IpTcpHost}"
-                                                    Os="{Binding Os}"
-                                                    Port="{Binding Port}"
-                                                    Host="{Binding Host}" 
-                                                    IsVisibilityButton="False"
-                                                    />
+                                    <controls:LanDevice Theme="{StaticResource LanDevice}"
+                                                        ConnectName="{Binding Name}"
+                                                        IpTcpHost="{Binding IpTcpHost}"
+                                                        Os="{Binding Os}"
+                                                        Port="{Binding Port}"
+                                                        Host="{Binding Host}"
+                                                        IsVisibilityButton="False" />
 
 
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    <Button Click="ButtonClickStartUdpServer" Grid.Row="1">Start</Button>
+                </Grid>
             </controls:IconTabItem>
             <controls:IconTabItem Header="Log"
                                   Classes="Buttom"
