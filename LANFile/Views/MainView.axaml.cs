@@ -47,15 +47,16 @@ public partial class MainView : UserControl
 
         var header = (iconTabItem.Header?.ToString() ?? string.Empty).ToLower();
 
-        _multiConnectionService.CloseAll();
 
         switch (header)
         {
             case "upload":
                 _multiConnectionService.ProbeStart();
+                _multiConnectionService.TCPServerStart();
                 break;
             case "download":
                 _multiConnectionService.BeaconStart();
+
                 break;
         }
     }

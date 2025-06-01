@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,7 @@ using BeaconLib;
 using Java.Net;
 using Java.Util;
 using LANFile.Models;
+using SuperSimpleTcp;
 
 namespace LANFile.Helper;
 
@@ -23,9 +25,16 @@ public class MultiConnectionService : IDisposable
     private Beacon? _beacon;
     private List<BeaconLocation> _beaconLocations = [];
     private Probe? _probe;
-
     public Action<ObservableCollection<DeviceModel>> DevicesUpdated;
     public IPAddress Host;
+
+    #region SimpleTcpServer
+
+    private readonly SimpleTcpServer _tcpServer = null;
+    private readonly int _tcpServerPort = 9459;
+
+    #endregion
+
 
     public MultiConnectionService()
     {
@@ -36,6 +45,10 @@ public class MultiConnectionService : IDisposable
             .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToArray().Last();
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Host = AndroidGetLocalIp();
+
+
+        _tcpServer = new SimpleTcpServer($"{Host}:{_tcpServerPort}");
+        Debug.WriteLine($"{Host}:{_tcpServerPort}");
     }
 
     public string NameApplication { get; set; } = $"{Guid.NewGuid().ToString().Substring(0, 8)}";
@@ -57,13 +70,31 @@ public class MultiConnectionService : IDisposable
         _probe?.Stop();
         _probe?.Dispose();
 
+        if (_tcpServer != null && _tcpServer.IsListening)
+            _tcpServer?.Stop();
 
         _probe = null;
         _beacon = null;
     }
 
+    public void TCPServerStart()
+    {
+        try
+        {
+            if (!_tcpServer.IsListening)
+                _tcpServer?.Start();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+
     public void ProbeStart()
     {
+        this.CloseAll();
         _probe = new Probe(ConnectionName, IPAddress.Any);
         _probe.BeaconsUpdated += ProbeOnBeaconsUpdated;
 
@@ -72,11 +103,16 @@ public class MultiConnectionService : IDisposable
         InvoceBeginReceivedProbeOrBeacon();
     }
 
+
     public void BeaconStart()
     {
+        this.CloseAll();
         _beacon = new Beacon(ConnectionName, 4863, IPAddress.Any);
-        _beacon.BeaconData = $"{Platform}-{NameApplication}";
+        _beacon.BeaconData =
+            $"{Platform};{NameApplication};{(_tcpServer != null ? _tcpServer.IpPort : "0.0.0.0:0000")}";
         _beacon?.Start();
+
+
         InvoceBeginReceivedProbeOrBeacon();
     }
 
@@ -100,9 +136,10 @@ public class MultiConnectionService : IDisposable
             var _listdevices = new List<DeviceModel>();
             foreach (var beaconLocation in _beaconLocations)
             {
-                var spData = beaconLocation.Data.Split("-").Select(l => l.Trim()).ToArray();
+                var spData = beaconLocation.Data.Split(";").Select(l => l.Trim()).ToArray();
                 if (spData.Count() < 2)
                     continue;
+                var ipHostTcp = spData[2];
                 var deviceName = spData[1];
                 var plaatform = spData[0];
 
@@ -113,7 +150,7 @@ public class MultiConnectionService : IDisposable
                     Name = deviceName,
                     Os = $"{plaatform.ToLower()}",
                     Port = beaconLocation.Address.Port.ToString(),
-                    Ping = 0
+                    IpTcpHost = ipHostTcp
                 };
                 _listdevices.Add(device);
             }

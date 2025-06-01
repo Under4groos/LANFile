@@ -12,9 +12,12 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string? _Host;
     [ObservableProperty] private string? _Title;
 
+    [ObservableProperty] private bool _isVisibleButton;
+
     public MainViewModel()
     {
         Title = "LANFile-Debug";
+        
     }
 
     public void Random()

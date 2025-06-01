@@ -50,10 +50,12 @@
 
                                 <controls:LanDevice Theme="{StaticResource LanDevice}"
                                                     ConnectName="{Binding Name}"
-
+                                                    IpTcpHost="{Binding IpTcpHost}"
                                                     Os="{Binding Os}"
                                                     Port="{Binding Port}"
-                                                    Host="{Binding Host}" />
+                                                    Host="{Binding Host}"
+                                                    IsVisibilityButton="True"
+                                                    />
 
 
                             </DataTemplate>
@@ -64,7 +66,35 @@
             <controls:IconTabItem Header="Download"
                                   Classes="Buttom"
                                   Source="/Assets/Svg/download.svg">
-                <Label>1</Label>
+                <ScrollViewer>
+
+                    <ItemsControl ItemsSource="{Binding  Devices}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel>
+                                    <VirtualizingStackPanel Orientation="Vertical" />
+
+                                </StackPanel>
+
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+
+                                <controls:LanDevice Theme="{StaticResource LanDevice}"
+                                                    ConnectName="{Binding Name}"
+                                                    IpTcpHost="{Binding IpTcpHost}"
+                                                    Os="{Binding Os}"
+                                                    Port="{Binding Port}"
+                                                    Host="{Binding Host}" 
+                                                    IsVisibilityButton="False"
+                                                    />
+
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </controls:IconTabItem>
             <controls:IconTabItem Header="Log"
                                   Classes="Buttom"

@@ -132,6 +132,7 @@ public class SimpleTcpServer : IDisposable
 
     #endregion
 
+    public string IpPort = string.Empty;
     #region Constructors-and-Factories
 
     /// <summary>
@@ -164,8 +165,11 @@ public class SimpleTcpServer : IDisposable
             }
         }
 
+     
         IsListening = false;
         _token = _tokenSource.Token;
+        
+        IpPort = ipPort;
     }
 
     /// <summary>

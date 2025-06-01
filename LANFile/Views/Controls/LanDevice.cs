@@ -14,6 +14,9 @@ namespace LANFile.Views.Controls;
 
 public class LanDevice : ContentControl
 {
+    public static readonly StyledProperty<bool> IsVisibilityButtonProperty =
+        AvaloniaProperty.Register<LanDevice, bool>(nameof(IsVisibilityButton));
+    
     public static readonly StyledProperty<string> ConnectNameProperty =
         AvaloniaProperty.Register<LanDevice, string>(nameof(ConnectName));
 
@@ -32,15 +35,21 @@ public class LanDevice : ContentControl
     public static readonly StyledProperty<string> PingProperty =
         AvaloniaProperty.Register<LanDevice, string>(nameof(Ping), "0ms");
 
-    public static readonly StyledProperty<string> HttpResultProperty =
-        AvaloniaProperty.Register<LanDevice, string>(nameof(HttpResult), "<null>");
+    public static readonly StyledProperty<string> IpTcpHostProperty =
+        AvaloniaProperty.Register<LanDevice, string>(nameof(IpTcpHost), "<null>");
 
-    private SimpleTcpClient? _simpleTcpClient;
+
     private Thread? _thread;
-
+    private SimpleTcpClient _tcpClient;
 
     private WrapPanel? _wrapPanel;
 
+    public bool IsVisibilityButton
+    {
+        get => GetValue(IsVisibilityButtonProperty);
+        set => SetValue(IsVisibilityButtonProperty, value);
+    }
+        
     public string ConnectName
     {
         get => GetValue(ConnectNameProperty);
@@ -71,10 +80,10 @@ public class LanDevice : ContentControl
         set => SetValue(PingProperty, value);
     }
 
-    public string HttpResult
+    public string IpTcpHost
     {
-        get => GetValue(HttpResultProperty);
-        set => SetValue(HttpResultProperty, value);
+        get => GetValue(IpTcpHostProperty);
+        set => SetValue(IpTcpHostProperty, value);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -88,12 +97,26 @@ public class LanDevice : ContentControl
         foreach (var button in buttons) button.Click += ButtonOnClick;
     }
 
-    protected override void OnUnloaded(RoutedEventArgs e)
+    void TCPClientConnect()
     {
-        _simpleTcpClient?.Disconnect();
-        _simpleTcpClient?.Dispose();
-        _simpleTcpClient = null;
-        base.OnUnloaded(e);
+        try
+        {
+            // if (_tcpClient != null && _tcpClient.IsConnected)
+            // {
+            //     _tcpClient.Disconnect();
+            //     _tcpClient.Dispose();
+            //     _tcpClient = null;
+            // }
+            //
+            //
+            // _tcpClient = new SimpleTcpClient($"{Host}:{Port}");
+            // _tcpClient.Connect();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception);
+            throw;
+        }
     }
 
     private void ButtonOnClick(object? sender, RoutedEventArgs e)
@@ -106,37 +129,8 @@ public class LanDevice : ContentControl
         {
             case "send":
 
-                break;
-            case "tcp":
-            {
-                try
-                {
-                    if (_simpleTcpClient != null)
-                    {
-                        if (_simpleTcpClient.IsConnected)
-                        {
-                            _simpleTcpClient.Send("Hello, world!");
-                        }
-                        else
-                        {
-                            _simpleTcpClient?.Dispose();
-                            _simpleTcpClient = null;
-                        }
-                    }
 
-                    if (_simpleTcpClient == null)
-                    {
-                        _simpleTcpClient = new SimpleTcpClient($"{Host}:9000");
-
-                        _simpleTcpClient.Connect();
-                    }
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception);
-                }
-            }
-
+                //TCPClientConnect();
 
                 break;
             case "ping":
